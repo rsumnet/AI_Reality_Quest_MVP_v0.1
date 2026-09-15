@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>AI Reality Quest — MVP v0.1</title>
+<style>
+:root{--bg:#0b1020;--card:#151c30;--card2:#1b2540;--text:#f4f7fb;--muted:#9eabc4;--accent:#7dd3fc;--good:#86efac;--warn:#fde68a;--bad:#fca5a5;--line:#2b3857}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#0b1020,#10172a);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{max-width:980px;margin:auto;padding:18px 14px 40px}.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}
+h1{font-size:25px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px}.badge{border:1px solid var(--line);padding:7px 10px;border-radius:999px;color:var(--accent);font-size:12px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:rgba(21,28,48,.94);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.16)}
+.card h2{font-size:16px;margin:0 0 10px}.camera{position:relative;overflow:hidden;border-radius:14px;background:#050812;aspect-ratio:4/3}
+video{width:100%;height:100%;object-fit:cover;display:block}.scan{position:absolute;inset:13%;border:2px dashed rgba(125,211,252,.75);border-radius:16px;pointer-events:none}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.btn{border:0;border-radius:11px;padding:10px 13px;background:var(--accent);color:#062033;font-weight:750;cursor:pointer}.btn.secondary{background:#26334f;color:var(--text)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.stat{background:var(--card2);padding:10px;border-radius:12px}.stat b{display:block;font-size:20px}.stat span{font-size:11px;color:var(--muted)}
+.result{margin-top:10px;padding:12px;border-radius:12px;background:var(--card2);min-height:70px}.confidence{font-weight:800}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.collection{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:330px;overflow:auto}.obj{padding:10px;border:1px solid var(--line);border-radius:12px;background:#121a2d}.obj .name{font-weight:800}.obj small{color:var(--muted)}
+.meter{height:8px;background:#0b1020;border-radius:99px;overflow:hidden;margin-top:8px}.meter i{display:block;height:100%;background:var(--accent);width:0%}
+.mission{padding:12px;border-radius:12px;background:var(--card2);line-height:1.5}.mission strong{font-size:18px}
+.evidence{font-size:12px;color:var(--muted);max-height:230px;overflow:auto}.ev{padding:9px 0;border-bottom:1px solid var(--line)}.ev:last-child{border:0}
+.game{display:none}.game.active{display:block}.choices{display:flex;gap:8px}.choice{flex:1;padding:13px;border-radius:12px;border:1px solid var(--line);background:#111a2e;color:var(--text);font-size:22px;cursor:pointer}
+.monster{font-size:52px;text-align:center;padding:10px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#f4f7fb;color:#08111e;padding:10px 15px;border-radius:999px;font-weight:750;display:none;z-index:5}
+.note{font-size:12px;color:var(--muted);line-height:1.55}.footer{margin-top:14px;color:var(--muted);font-size:11px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><h1>🗺️ AI Reality Quest</h1><div class="sub">AI에게 세상을 가르치고, AI와 함께 세상을 탐험한다.</div></div>
+    <div class="badge">MVP v0.1 · Browser / On-device inference</div>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>① Reality Scanner</h2>
+      <div class="camera"><video id="video" autoplay playsinline muted></video><div class="scan"></div></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="start">카메라 시작</button>
+        <button class="btn secondary" id="gps">GPS/Zone 기록</button>
+        <button class="btn secondary" id="scanBtn" disabled>지금 발견!</button>
+      </div>
+      <div class="result" id="result">먼저 카메라를 시작하세요.</div>
+      <div class="stats">
+        <div class="stat"><b id="count">0</b><span>수집 객체</span></div>
+        <div class="stat"><b id="evCount">0</b><span>Evidence</span></div>
+        <div class="stat"><b id="zone">—</b><span>현재 Zone</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>② Quest</h2>
+      <div class="mission">
+        <div>현재 미션</div>
+        <strong>서로 다른 객체 3개 수집</strong>
+        <div class="meter"><i id="progress"></i></div>
+        <div id="progressText" style="margin-top:6px;color:var(--muted)">0 / 3</div>
+      </div>
+      <p class="note">AI가 발견한 객체는 즉시 Evidence가 됩니다. confidence가 낮아도 기록은 남습니다. 게임에서 이긴 뒤에만 Monster가 생성됩니다.</p>
+
+      <div id="game" class="game">
+        <h2>③ Monster Battle — 가위바위보</h2>
+        <div class="note">수집 미션을 통과했습니다. 객체 Evidence를 기반으로 Battle을 시작하세요.</div>
+        <div class="row" style="margin:10px 0"><button class="btn secondary" id="newBattle">새 Battle</button></div>
+        <div class="choices">
+          <button class="choice" data-choice="rock">✊</button>
+          <button class="choice" data-choice="paper">✋</button>
+          <button class="choice" data-choice="scissors">✌️</button>
+        </div>
+        <div class="result" id="battleResult">선택하세요.</div>
+        <div id="monster" class="monster"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:14px">
+    <h2>④ My Reality Evidence</h2>
+    <div class="collection" id="collection"></div>
+    <div class="evidence" id="evidence"></div>
+  </section>
+
+  <div class="footer">
+    교육용 MVP입니다. 카메라/위치 권한이 필요하며, 현재 구현은 브라우저에서 모델 추론을 수행하고 Evidence를 localStorage에 저장합니다.
+    실제 배포 전에는 HTTPS, 개인정보 보호, 미성년자 동의/보호 절차, 모델/라이브러리 라이선스를 별도 검토해야 합니다.
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script>
+const state={model:null,stream:null,last:null,zone:null,evidence:JSON.parse(localStorage.getItem('arq_evidence')||'[]'),monsters:JSON.parse(localStorage.getItem('arq_monsters')||'[]')};
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem('arq_evidence',JSON.stringify(state.evidence));localStorage.setItem('arq_monsters',JSON.stringify(state.monsters))}
+function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1800)}
+function zoneFrom(lat,lon){return 'Z'+Math.floor((Math.abs(lat*1000)+Math.abs(lon*1000))%99).toString().padStart(2,'0')}
+function render(){
+ const uniq=[...new Set(state.evidence.map(e=>e.object))]; $('count').textContent=uniq.length; $('evCount').textContent=state.evidence.length;
+ $('zone').textContent=state.zone||'—'; $('progressText').textContent=uniq.length+' / 3'; $('progress').style.width=Math.min(100,uniq.length/3*100)+'%';
+ $('collection').innerHTML=uniq.length?uniq.map(n=>`<div class="obj"><div class="name">🔎 ${n}</div><small>${state.evidence.filter(e=>e.object===n).length} Evidence</small></div>`).join(''):'<div class="note">아직 발견한 객체가 없습니다.</div>';
+ $('evidence').innerHTML=state.evidence.slice().reverse().map(e=>`<div class="ev"><b>${e.object}</b> · ${(e.confidence*100).toFixed(1)}% · ${e.zone||'Zone 없음'}<br>${new Date(e.time).toLocaleString()} · ${e.source} · ${e.processing}</div>`).join('');
+ $('game').classList.toggle('active',uniq.length>=3);
+}
+async function startCamera(){
+ try{
+   state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+   $('video').srcObject=state.stream;$('scanBtn').disabled=false;$('result').textContent='모델을 불러오는 중…';
+   state.model=await cocoSsd.load();
+   $('result').innerHTML='<span class="good">준비 완료.</span> 현실의 객체를 화면 중앙에 놓고 “지금 발견!”을 눌러보세요.';
+   toast('AI Reality Scanner 준비 완료');
+ }catch(e){$('result').innerHTML='<span class="bad">카메라를 시작할 수 없습니다.</span><br>'+e.message}
+}
+async function scan(){
+ if(!state.model)return;
+ $('result').textContent='AI가 현실을 관찰하는 중…';
+ const predictions=await state.model.detect($('video'));
+ if(!predictions.length){$('result').innerHTML='<span class="warn">객체를 찾지 못했습니다.</span> 각도·거리·배경을 바꿔 다시 시도해보세요.';return}
+ predictions.sort((a,b)=>b.score-a.score);const p=predictions[0];
+ state.last=p;
+ $('result').innerHTML=`<b>${p.class}</b> 발견 · <span class="confidence">${(p.score*100).toFixed(1)}%</span><br><span class="note">Prediction → Confidence → Reality Evidence</span>`;
+ const ev={id:crypto.randomUUID(),object:p.class.toUpperCase(),confidence:p.score,time:new Date().toISOString(),zone:state.zone,source:'phone_camera',processing:'on_device_browser_model',condition:{angle:'unknown',distance:'unknown',lighting:'unknown'}};
+ state.evidence.push(ev);save();render();toast(`${p.class} Evidence 저장`);
+}
+function gps(){
+ if(!navigator.geolocation){toast('이 브라우저는 GPS를 지원하지 않습니다.');return}
+ navigator.geolocation.getCurrentPosition(pos=>{
+   state.zone=zoneFrom(pos.coords.latitude,pos.coords.longitude);
+   // Raw GPS is intentionally not persisted in MVP.
+   render();toast(`현재 Zone: ${state.zone}`);
+ },e=>toast('위치 권한이 필요합니다.'));
+}
+const beats={rock:'scissors',paper:'rock',scissors:'paper'};
+const labels={rock:'✊ 바위',paper:'✋ 보',scissors:'✌️ 가위'};
+let wins=0;
+function battle(choice){
+ const arr=Object.keys(beats), ai=arr[Math.floor(Math.random()*3)];
+ let r=choice===ai?'DRAW':beats[choice]===ai?'WIN':'LOSE';
+ $('battleResult').innerHTML=`당신 ${labels[choice]} · AI ${labels[ai]} → <b class="${r==='WIN'?'good':r==='LOSE'?'bad':'warn'}">${r}</b>`;
+ if(r==='WIN'){wins++; const uniq=[...new Set(state.evidence.map(e=>e.object))];const target=uniq[uniq.length-1];const monster={object:target,time:new Date().toISOString(),symbol:['🦊','🐉','🦖','🦉','🐙'][state.monsters.length%5]};state.monsters.push(monster);save();$('monster').textContent=monster.symbol+' '+monster.object+' MONSTER';toast(`${target}가 Monster가 되었습니다!`)}
+}
+$('start').onclick=startCamera;$('scanBtn').onclick=scan;$('gps').onclick=gps;
+document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>battle(b.dataset.choice));
+$('newBattle').onclick=()=>{$('battleResult').textContent='선택하세요.';$('monster').textContent=''};
+render();
+</script>
+</body>
+</html>
