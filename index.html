@@ -114,7 +114,7 @@ function p2BattleStats(id){
 }
 function p2ContextText(c){
   const s=p2BattleStats(c.physical_object_id);
-  return `이전에 ${s.collected}번 수집했고 ${s.missed}번 놓쳤던 Monster, ${c.name}입니다.`;
+  const name=c.name||displayNameFor(c.physical_object_id);\n  return `이전에 ${s.collected}번 수집했고 ${s.missed}번 놓쳤던 Monster, ${name}입니다.`;
 }
 function commitPersonalContext(id){
   const candidate=p2Candidates().find(x=>x.physical_object_id===id);
