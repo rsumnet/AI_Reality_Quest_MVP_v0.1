@@ -54,18 +54,28 @@
     <div class="sectionTitle" style="margin-top:14px"><h2 style="margin:0">Raw Evidence Log</h2><span class="pill">All observations</span></div>
     <div class="evidence" id="evidence"></div>
   </section>
+  <section class="card" style="margin-top:14px">
+    <div class="sectionTitle"><h2>⑤ Personal Context → My AI</h2><span class="pill">P2 Minimal MVP</span></div>
+    <div id="contextCandidates" class="note">Evidence가 2회 이상 누적된 확정 객체에서 Personal Context 후보를 제안합니다.</div>
+    <div id="personalContexts" class="collection" style="margin-top:10px"></div>
+    <div id="myAiResult" class="result" style="margin-top:10px">아직 확인된 Personal Context가 없습니다.</div>
+    <div class="note" style="margin-top:8px">
+      Evidence는 “무슨 일이 있었는가”, Personal Context는 “이 사용자에게 무엇을 의미하는가”를 구분합니다.
+      AI는 Context 후보를 제안하고, 사용자가 확인한 것만 Personal Context가 됩니다.
+    </div>
+  </section>
   <div class="footer">교육용 MVP입니다. 카메라/위치 권한이 필요하며, 현재 구현은 브라우저에서 모델 추론을 수행하고 Evidence를 localStorage에 저장합니다. Physical Object Identity는 현재 카메라 이미지의 간단한 시각적 fingerprint를 이용한 MVP 수준의 중복 판정입니다. 실제 배포 전에는 HTTPS, 개인정보 보호, 미성년자 동의/보호 절차, 모델/라이브러리 라이선스를 별도 검토해야 합니다.</div>
 </div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
 <script>
-const ARQ_SCHEMA_VERSION='0.2.8';
+const ARQ_SCHEMA_VERSION='0.3.0';
 const PERSONAL_AI_SCHEMA={evidence:['id','object','confidence','time','location','zone','source','model','processing','human_feedback','context_ref','physical_object_id','visual_fingerprint'],context:['id','purpose','mission','situation','references','history'],rules:['id','when','condition','then','priority','source']};
-const state={model:null,stream:null,last:null,zone:localStorage.getItem('arq_zone')||null,gps:JSON.parse(localStorage.getItem('arq_gps')||'null'),evidence:JSON.parse(localStorage.getItem('arq_evidence')||'[]'),monsters:JSON.parse(localStorage.getItem('arq_monsters')||'[]'),battles:JSON.parse(localStorage.getItem('arq_battles')||'[]'),attempts:JSON.parse(localStorage.getItem('arq_attempts')||'[]'),battlePending:JSON.parse(localStorage.getItem('arq_battle_pending')||'null'),battleUnlocked:localStorage.getItem('arq_battle_unlocked')==='1',questObjects:JSON.parse(localStorage.getItem('arq_quest_objects')||'[]').map(q=>typeof q==='string'?{name:q,physical_object_id:null}:q),selectedObjectId:null,selectedEvidenceId:null};state.battleUnlocked=state.battleUnlocked||state.questObjects.length>=3;
+const state={model:null,stream:null,last:null,personalContexts:JSON.parse(localStorage.getItem('arq_personal_contexts')||'[]'),zone:localStorage.getItem('arq_zone')||null,gps:JSON.parse(localStorage.getItem('arq_gps')||'null'),evidence:JSON.parse(localStorage.getItem('arq_evidence')||'[]'),monsters:JSON.parse(localStorage.getItem('arq_monsters')||'[]'),battles:JSON.parse(localStorage.getItem('arq_battles')||'[]'),attempts:JSON.parse(localStorage.getItem('arq_attempts')||'[]'),battlePending:JSON.parse(localStorage.getItem('arq_battle_pending')||'null'),battleUnlocked:localStorage.getItem('arq_battle_unlocked')==='1',questObjects:JSON.parse(localStorage.getItem('arq_quest_objects')||'[]').map(q=>typeof q==='string'?{name:q,physical_object_id:null}:q),selectedObjectId:null,selectedEvidenceId:null};state.battleUnlocked=state.battleUnlocked||state.questObjects.length>=3;
 
 const $=id=>document.getElementById(id);
-function save(){localStorage.setItem('arq_zone',state.zone||'');localStorage.setItem('arq_gps',JSON.stringify(state.gps));localStorage.setItem('arq_evidence',JSON.stringify(state.evidence));localStorage.setItem('arq_monsters',JSON.stringify(state.monsters));localStorage.setItem('arq_battles',JSON.stringify(state.battles));localStorage.setItem('arq_attempts',JSON.stringify(state.attempts));localStorage.setItem('arq_battle_pending',JSON.stringify(state.battlePending));localStorage.setItem('arq_battle_unlocked',state.battleUnlocked?'1':'0');localStorage.setItem('arq_quest_objects',JSON.stringify(state.questObjects));}
+function save(){localStorage.setItem('arq_personal_contexts',JSON.stringify(state.personalContexts));localStorage.setItem('arq_zone',state.zone||'');localStorage.setItem('arq_gps',JSON.stringify(state.gps));localStorage.setItem('arq_evidence',JSON.stringify(state.evidence));localStorage.setItem('arq_monsters',JSON.stringify(state.monsters));localStorage.setItem('arq_battles',JSON.stringify(state.battles));localStorage.setItem('arq_attempts',JSON.stringify(state.attempts));localStorage.setItem('arq_battle_pending',JSON.stringify(state.battlePending));localStorage.setItem('arq_battle_unlocked',state.battleUnlocked?'1':'0');localStorage.setItem('arq_quest_objects',JSON.stringify(state.questObjects));}
 function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1800)}
 function zoneFrom(lat,lon){return 'Z'+Math.floor((Math.abs(lat*1000)+Math.abs(lon*1000))%99).toString().padStart(2,'0')}
 function canonicalBase(label){return String(label||'object').trim().toUpperCase().replace(/[^A-Z0-9가-힣]+/g,'_').replace(/^_+|_+$/g,'')||'OBJECT'}
@@ -83,6 +93,67 @@ function evidenceStatus(e){const s=e?.human_feedback?.status;if(s==='merged_by_h
 function openObjectHistory(id){state.selectedObjectId=id;state.selectedEvidenceId=null;const es=state.evidence.filter(e=>e.physical_object_id===id).sort((a,b)=>new Date(b.time)-new Date(a.time));if(!es.length)return;const st=objectStatsById(id),name=displayNameFor(id);$('objectView').classList.add('show');$('objectViewTitle').textContent=`${name} · Object History`;$('objectSummary').innerHTML=`Physical Object: <b>${esc(id)}</b> · AI Label: <b>${esc(es[0].ai_label||'unknown')}</b> · Evidence <b>${st.count}</b> · 평균 관측 <b>${(st.avg*100).toFixed(1)}%</b>`;$('objectHistory').innerHTML=es.map(e=>{const [status,cls]=evidenceStatus(e);return `<div class="historyItem" data-evidence-id="${esc(e.id)}"><b>Evidence #${esc(e.id.slice(-6))}</b> · AI ${esc(e.ai_label||'unknown')} · ${(Number(e.confidence||0)*100).toFixed(1)}% · <span class="${cls}">${status}</span><br><small>${new Date(e.time).toLocaleString()} · ${esc(e.zone||'Zone 없음')}</small></div>`}).join('');document.querySelectorAll('.historyItem').forEach(x=>x.onclick=()=>openEvidenceDetail(x.dataset.evidenceId));$('evidenceDetail').style.display='none'}
 function openEvidenceDetail(id){const e=state.evidence.find(x=>x.id===id);if(!e)return;state.selectedEvidenceId=id;const [status,cls]=evidenceStatus(e),gps=e.location?.gps;const human=e.user_label||'아직 인간 확인 없음';$('evidenceDetail').style.display='block';$('evidenceDetail').innerHTML=`<div class="sectionTitle"><b>Evidence #${esc(e.id.slice(-6))}</b><span class="${cls}">${status}</span></div><div class="kv" style="margin-top:8px"><b>AI Label</b><span>${esc(e.ai_label||'unknown')}</span><b>Confidence</b><span>${(Number(e.confidence||0)*100).toFixed(1)}%</span><b>Human Label</b><span>${esc(human)}</span><b>Time</b><span>${new Date(e.time).toLocaleString()}</span><b>Zone</b><span>${esc(e.zone||'없음')}</span><b>GPS</b><span>${gps?`${Number(gps.lat).toFixed(6)}, ${Number(gps.lon).toFixed(6)}`:'기록 없음'}</span><b>Source</b><span>${esc(e.source||'unknown')}</span><b>Model</b><span>${esc(e.model||'unknown')}</span><b>Processing</b><span>${esc(e.processing||'unknown')}</span><b>Physical Object</b><span>${esc(e.physical_object_id||'없음')}</span><b>Human Feedback</b><span>${esc(e.human_feedback?.status||'unreviewed')}</span></div>`}
 function closeObjectHistory(){state.selectedObjectId=null;state.selectedEvidenceId=null;$('objectView').classList.remove('show');$('evidenceDetail').style.display='none'}
+function p2ContextFor(id){return state.personalContexts.find(c=>c.physical_object_id===id&&c.status==='CONFIRMED')||null}
+function p2Candidates(){
+  return confirmedObjects().map(r=>{
+    const es=state.evidence.filter(e=>e.physical_object_id===r.id);
+    if(es.length<2||p2ContextFor(r.id))return null;
+    const name=displayNameFor(r.id);
+    return {physical_object_id:r.id,name,evidence_count:es.length,avg:objectStatsById(r.id).avg,ai_label:es[0]?.ai_label||'UNKNOWN'};
+  }).filter(Boolean);
+}
+function p2BattleStats(id){
+  let collected=0,missed=0,encounters=0;
+  for(const b of state.battles){
+    if(b.opponentPhysicalObjectId!==id)continue;
+    encounters++;
+    if(b.result==='WIN')collected++;
+    if(b.result==='LOSE')missed++;
+  }
+  return {collected,missed,encounters};
+}
+function p2ContextText(c){
+  const s=p2BattleStats(c.physical_object_id);
+  const name=c.name||displayNameFor(c.physical_object_id);
+  return `이전에 ${s.collected}번 수집했고 ${s.missed}번 놓쳤던 Monster, ${name}입니다.`;
+}
+function commitPersonalContext(id){
+  const candidate=p2Candidates().find(x=>x.physical_object_id===id);
+  if(!candidate)return;
+  const context={
+    schemaVersion:'0.3.0',
+    id:crypto.randomUUID(),
+    type:'physical_object_identity',
+    status:'CONFIRMED',
+    purpose:'my_ai_personal_recognition',
+    physical_object_id:id,
+    name:candidate.name,
+    committedAt:new Date().toISOString(),
+    evidence_refs:state.evidence.filter(e=>e.physical_object_id===id).map(e=>e.id),
+    meaning:`${candidate.name}은 사용자가 반복 관찰하고 확인한 개인의 Physical Object이다.`
+  };
+  state.personalContexts=state.personalContexts.filter(c=>c.physical_object_id!==id);
+  state.personalContexts.push(context);
+  save();render();showMyAI(id);toast('Personal Context를 확인했습니다.');
+}
+function showMyAI(id){
+  const c=p2ContextFor(id);
+  if(!c){$('myAiResult').textContent='아직 확인된 Personal Context가 없습니다.';return}
+  const s=p2BattleStats(id),name=displayNameFor(id);
+  $('myAiResult').innerHTML=`<b>My AI가 이전 Context를 사용했습니다.</b><br><span class="good">${esc(p2ContextText(c))}</span><br><span class="note">${esc(name)} · Evidence ${state.evidence.filter(e=>e.physical_object_id===id).length}회 · Battle ${s.encounters}회</span>`;
+}
+function renderP2(){
+  const candidates=p2Candidates();
+  $('contextCandidates').innerHTML=candidates.length
+    ? `<b>AI Context 후보</b><br>${candidates.map(c=>`<div class="obj" style="margin-top:8px"><div class="name">${esc(c.name)}</div><small>Evidence ${c.evidence_count}회 · 평균 관측 ${(c.avg*100).toFixed(1)}%</small><div style="margin-top:6px">“${esc(c.name)}은 반복해서 관찰된 나의 객체입니다.”</div><div class="row" style="margin-top:8px"><button class="btn" data-context-id="${esc(c.physical_object_id)}">Personal Context로 확인</button></div></div>`).join('')}`
+    : '현재 확인할 Personal Context 후보가 없습니다. 같은 확정 객체의 Evidence를 2회 이상 쌓아보세요.';
+  $('personalContexts').innerHTML=state.personalContexts.length
+    ? state.personalContexts.slice().reverse().map(c=>{const n=displayNameFor(c.physical_object_id);return `<div class="obj"><div class="name">✓ ${esc(n)}</div><small>CONFIRMED · ${new Date(c.committedAt).toLocaleString()}</small><div style="margin-top:6px">${esc(c.meaning)}</div><div class="row" style="margin-top:8px"><button class="btn secondary" data-my-ai-id="${esc(c.physical_object_id)}">My AI 사용</button></div></div>`}).join('')
+    : '<div class="note">아직 확인된 Personal Context가 없습니다.</div>';
+  document.querySelectorAll('[data-context-id]').forEach(b=>b.onclick=()=>commitPersonalContext(b.dataset.contextId));
+  document.querySelectorAll('[data-my-ai-id]').forEach(b=>b.onclick=()=>showMyAI(b.dataset.myAiId));
+  if(!state.personalContexts.length)$('myAiResult').textContent='아직 확인된 Personal Context가 없습니다.';
+}
 function render(){
  const confirmed=confirmedObjects();
  $('game').style.display=state.battleUnlocked?'block':'none';
@@ -98,6 +169,7 @@ function render(){
  document.querySelectorAll('.rename').forEach(btn=>btn.onclick=()=>renameObject(btn.dataset.id,btn.parentElement.querySelector('input').value));document.querySelectorAll('.historyBtn').forEach(btn=>btn.onclick=()=>openObjectHistory(btn.dataset.id));
  document.querySelectorAll('.evrename').forEach(btn=>btn.onclick=()=>renameEvidence(btn.dataset.id,btn.parentElement.querySelector('input').value));
  $('gpsStatus').innerHTML=state.gps&&state.zone?`GPS: ${state.gps.lat.toFixed(6)}, ${state.gps.lon.toFixed(6)} · Zone: ${state.zone}`:'GPS/Zone: 아직 기록되지 않았습니다.';
+ renderP2();
 }
 function addConfirmedToQuest(physicalObjectId){if(!physicalObjectId||!isConfirmedId(physicalObjectId)||state.questObjects.length>=3)return false;if(state.monsters.some(m=>m.physical_object_id===physicalObjectId))return false;if(state.questObjects.some(q=>q.physical_object_id===physicalObjectId))return false;const n=displayNameFor(physicalObjectId);state.questObjects.push({name:n,physical_object_id:physicalObjectId});if(state.questObjects.length===3)state.battleUnlocked=true;return true}
 function validUserLabel(v){const x=v.trim().replace(/\s+/g,' ');return /[A-Za-z0-9]/.test(x)&&/^[A-Za-z0-9가-힣]+(?:[ _-][A-Za-z0-9가-힣]+)*$/i.test(x)}
@@ -202,7 +274,7 @@ function battle(choice){
  }
  const actorName=actor?actor.name||actor.object:playerNick();
  const actorChoice=choice,opponentChoice=Object.keys(beats)[Math.floor(Math.random()*3)],r=rpsResult(actorChoice,opponentChoice);
- const rec={time:new Date().toISOString(),actor:actorName,actorType,opponent:opponent.name,opponentType:'quest_monster',result:r,choice:actorChoice,ai:opponentChoice,acquired:null,questObjects:quest.map(q=>q.name)};
+ const rec={time:new Date().toISOString(),actor:actorName,actorType,opponent:opponent.name,opponentPhysicalObjectId:opponent.physical_object_id||null,opponentType:'quest_monster',result:r,choice:actorChoice,ai:opponentChoice,acquired:null,questObjects:quest.map(q=>q.name)};
  $('battleResult').innerHTML=`${esc(actorName)} ${labels[actorChoice]} · ${esc(opponent.name)} MONSTER ${labels[opponentChoice]} → <b class="${r==='WIN'?'good':r==='LOSE'?'bad':'warn'}">${r}</b>`;
  if(r==='DRAW'){
   rec.message='무승부입니다. 다시 승부하세요.';state.battles.push(rec);state.battlePending={actorType,actorId:actor?.id||null,actorName,opponent};save();
