@@ -126,6 +126,7 @@ function commitPersonalContext(id){
     status:'CONFIRMED',
     purpose:'my_ai_personal_recognition',
     physical_object_id:id,
+    name:candidate.name,
     committedAt:new Date().toISOString(),
     evidence_refs:state.evidence.filter(e=>e.physical_object_id===id).map(e=>e.id),
     meaning:`${candidate.name}은 사용자가 반복 관찰하고 확인한 개인의 Physical Object이다.`
