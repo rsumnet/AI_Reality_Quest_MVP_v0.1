@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#111827">
-<title>AI Reality Quest — MVP v0.2.8</title>
+<title>AI Reality Quest — MVP v0.4.0</title>
 <style>
 :root{--bg:#0b1020;--card:#151c30;--card2:#1b2540;--text:#f4f7fb;--muted:#9eabc4;--accent:#7dd3fc;--good:#86efac;--warn:#fde68a;--bad:#fca5a5;--line:#2b3857}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#0b1020,#10172a);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -19,7 +19,7 @@
 </head>
 <body>
 <div class="app">
-  <div class="top"><div><h1>🗺️ AI Reality Quest</h1><div class="sub">AI에게 세상을 가르치고, AI와 함께 세상을 탐험한다.</div></div><div class="badge">MVP v0.2.8 · Browser / On-device inference</div></div>
+  <div class="top"><div><h1>🗺️ AI Reality Quest</h1><div class="sub">AI에게 세상을 가르치고, AI와 함께 세상을 탐험한다.</div></div><div class="badge">MVP v0.4.0 · Browser / On-device inference</div></div>
   <div class="grid">
     <section class="card">
       <h2>① Reality Scanner</h2>
@@ -38,7 +38,7 @@
         <h2>③ Monster Battle — 가위바위보</h2><div class="note">Quest에서 서로 다른 게임용 객체 3개를 모으면 Battle을 시작할 수 있습니다. 수집한 Monster는 최대 3마리까지 먼저 출전하고, 모두 패배하면 고객이 직접 승부합니다.</div>
         <div class="row" style="margin:10px 0"><button class="btn secondary" id="newBattle">새 Battle</button></div>
         <div class="choices"><button class="choice" data-choice="rock">✊</button><button class="choice" data-choice="paper">✋</button><button class="choice" data-choice="scissors">✌️</button></div>
-        <div class="result" id="battleResult">아직 3개 객체를 모으지 않았습니다.</div><div id="battleMonster" class="monster"></div><div id="monster" class="status">출전 Monster가 없습니다.</div><div class="status" id="battleHistory">아직 Battle 결과가 없습니다.</div>
+        <div class="result" id="battleResult">아직 3개 객체를 모으지 않았습니다.</div><div id="battleMonster" class="monster"></div><div id="monster" class="status">출전 Monster가 없습니다.</div><div class="status" id="battleHistory">아직 Battle 결과가 없습니다.</div><div class="note" style="margin-top:8px">P3는 Personal Context가 확인된 경우에만 Rule Engine이 다음 상대 선택에 개입합니다. Context가 없으면 기존 Battle 로직을 그대로 사용합니다.</div>
       </div>
     </section>
   </div>
@@ -64,13 +64,16 @@
       AI는 Context 후보를 제안하고, 사용자가 확인한 것만 Personal Context가 됩니다.
     </div>
   </section>
+  <section class="card" style="margin-top:14px"><div class="sectionTitle"><h2>⑥ Context-Driven AI Behavior</h2><span class="pill">P3 · Rule Engine</span></div><div class="note">Personal Context가 My AI의 다음 판단을 실제로 바꾸는지 검증합니다. 현재는 교체 가능한 Simple Rule Engine을 사용합니다.</div><div class="result" style="margin-top:10px"><b>현재 P3 엔진</b><br><span class="good">simple-0.1</span><br><span class="note">계약: Personal Context + Battle History + 후보 → 다음 판단 + 판단 근거</span></div><div class="note" style="margin-top:8px">Context가 없는 경우 기존 Battle과 동일하게 동작하고, Context가 있는 경우 과거에 놓친 개인 객체를 우선 선택합니다. 이후 Simple Rule Engine만 Huge Rule Engine으로 교체할 수 있습니다.</div></section>
   <div class="footer">교육용 MVP입니다. 카메라/위치 권한이 필요하며, 현재 구현은 브라우저에서 모델 추론을 수행하고 Evidence를 localStorage에 저장합니다. Physical Object Identity는 현재 카메라 이미지의 간단한 시각적 fingerprint를 이용한 MVP 수준의 중복 판정입니다. 실제 배포 전에는 HTTPS, 개인정보 보호, 미성년자 동의/보호 절차, 모델/라이브러리 라이선스를 별도 검토해야 합니다.</div>
 </div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
 <script>
-const ARQ_SCHEMA_VERSION='0.3.0';
+const ARQ_SCHEMA_VERSION='0.4.0';
+const P3_RULE_ENGINE_VERSION='simple-0.1';
+const P3_RULE_ENGINE={version:P3_RULE_ENGINE_VERSION,evaluate({contexts,battles,candidates}){const confirmed=contexts.filter(c=>c.status==='CONFIRMED');if(!confirmed.length||!candidates.length)return {applied:false,selected:null,reason:'Personal Context 없음'};const scored=candidates.map(candidate=>{const context=confirmed.find(c=>c.physical_object_id===candidate.physical_object_id);if(!context)return {...candidate,score:0,reason:'Context 없음'};const stats=p2BattleStats(candidate.physical_object_id);const score=1+(stats.missed*3)+(stats.encounters*0.1);return {...candidate,score,context,stats,reason:stats.missed>0?'과거에 놓친 객체를 우선 재대결 대상으로 선택':'반복 관찰된 개인 객체를 우선 선택'};}).sort((a,b)=>b.score-a.score);const selected=scored[0];return {applied:true,selected,reason:selected.reason,engine:this.version};}};
 const PERSONAL_AI_SCHEMA={evidence:['id','object','confidence','time','location','zone','source','model','processing','human_feedback','context_ref','physical_object_id','visual_fingerprint'],context:['id','purpose','mission','situation','references','history'],rules:['id','when','condition','then','priority','source']};
 const state={model:null,stream:null,last:null,personalContexts:JSON.parse(localStorage.getItem('arq_personal_contexts')||'[]'),zone:localStorage.getItem('arq_zone')||null,gps:JSON.parse(localStorage.getItem('arq_gps')||'null'),evidence:JSON.parse(localStorage.getItem('arq_evidence')||'[]'),monsters:JSON.parse(localStorage.getItem('arq_monsters')||'[]'),battles:JSON.parse(localStorage.getItem('arq_battles')||'[]'),attempts:JSON.parse(localStorage.getItem('arq_attempts')||'[]'),battlePending:JSON.parse(localStorage.getItem('arq_battle_pending')||'null'),battleUnlocked:localStorage.getItem('arq_battle_unlocked')==='1',questObjects:JSON.parse(localStorage.getItem('arq_quest_objects')||'[]').map(q=>typeof q==='string'?{name:q,physical_object_id:null}:q),selectedObjectId:null,selectedEvidenceId:null};state.battleUnlocked=state.battleUnlocked||state.questObjects.length>=3;
 
@@ -252,6 +255,7 @@ function gps(){clearBattleResult();if(!navigator.geolocation){$('gpsStatus').inn
 const beats={rock:'scissors',paper:'rock',scissors:'paper'};const labels={rock:'✊ 바위',paper:'✋ 보',scissors:'✌️ 가위'};
 function playerNick(){return localStorage.getItem('arq_nickname')||'고객'}
 function monsterFight(choice){const available=state.monsters.slice(-3);if(!available.length)return null;const m=available[Math.floor(Math.random()*available.length)],arr=Object.keys(beats),ai=arr[Math.floor(Math.random()*3)],r=choice===ai?'DRAW':beats[choice]===ai?'WIN':'LOSE';return {monster:m,ai,r}}
+function p3SelectOpponent(quest){const candidates=quest.map(q=>makeQuestMonster(q));const decision=P3_RULE_ENGINE.evaluate({contexts:state.personalContexts,battles:state.battles,candidates});if(!decision.applied||!decision.selected)return {opponent:candidates[Math.floor(Math.random()*candidates.length)],decision};return {opponent:decision.selected,decision};}
 function opponentFromQuest(quest){const q=quest[Math.floor(Math.random()*quest.length)];const base=displayNameFor(q.physical_object_id);return {name:base,object:base,physical_object_id:q.physical_object_id}}
 function rpsResult(a,b){return a===b?'DRAW':beats[a]===b?'WIN':'LOSE'}
 function makeQuestMonster(q){const name=displayNameFor(q.physical_object_id);return {name,object:name,physical_object_id:q.physical_object_id}}
@@ -261,7 +265,8 @@ function battle(choice){
  const pending=state.battlePending;
  if(quest.length<3&&!pending){$('battleResult').textContent='다음 Battle을 시작하려면 새로운 객체 3개를 모아주세요.';return}
  state.battleUnlocked=true;
- const opponent=pending?.opponent||makeQuestMonster(quest[Math.floor(Math.random()*quest.length)]);
+ const p3Selection=pending?{opponent:pending.opponent,decision:{applied:false,reason:'기존 Battle 진행 중'}}:p3SelectOpponent(quest);
+ const opponent=p3Selection.opponent;
  let actor=null,actorType='customer';
  if(pending?.actorType==='monster'){
   actor=state.monsters.find(m=>m.id===pending.actorId)||null;
