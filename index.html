@@ -175,7 +175,7 @@ function render(){
  document.querySelectorAll('.rename').forEach(btn=>btn.onclick=()=>renameObject(btn.dataset.id,btn.parentElement.querySelector('input').value));document.querySelectorAll('.logMore').forEach(btn=>btn.onclick=()=>{const box=$(btn.dataset.logTarget);box.classList.toggle('expanded');btn.textContent=box.classList.contains('expanded')?'접기':'더보기';});document.querySelectorAll('.historyBtn').forEach(btn=>btn.onclick=()=>openObjectHistory(btn.dataset.id));
  document.querySelectorAll('.evrename').forEach(btn=>btn.onclick=()=>renameEvidence(btn.dataset.id,btn.parentElement.querySelector('input').value));
  $('gpsStatus').innerHTML=state.gps&&state.zone?`GPS: ${state.gps.lat.toFixed(6)}, ${state.gps.lon.toFixed(6)} · Zone: ${state.zone}`:'GPS/Zone: 아직 기록되지 않았습니다.';
- renderP2();
+ renderP2();document.querySelectorAll('.logMore').forEach(btn=>{const box=$(btn.dataset.logTarget);btn.style.display=box.scrollHeight>box.clientHeight?'inline-block':'none';});
 }
 function addConfirmedToQuest(physicalObjectId){if(!physicalObjectId||!isConfirmedId(physicalObjectId)||state.questObjects.length>=3)return false;if(state.monsters.some(m=>m.physical_object_id===physicalObjectId))return false;if(state.questObjects.some(q=>q.physical_object_id===physicalObjectId))return false;const n=displayNameFor(physicalObjectId);state.questObjects.push({name:n,physical_object_id:physicalObjectId});if(state.questObjects.length===3)state.battleUnlocked=true;return true}
 function validUserLabel(v){const x=v.trim().replace(/\s+/g,' ');return /[A-Za-z0-9]/.test(x)&&/^[A-Za-z0-9가-힣]+(?:[ _-][A-Za-z0-9가-힣]+)*$/i.test(x)}
