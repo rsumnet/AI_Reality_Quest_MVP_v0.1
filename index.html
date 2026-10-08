@@ -38,7 +38,7 @@
         <h2>③ Monster Battle — 가위바위보</h2><div class="note">Quest에서 서로 다른 게임용 객체 3개를 모으면 Battle을 시작할 수 있습니다. 수집한 Monster는 최대 3마리까지 먼저 출전하고, 모두 패배하면 고객이 직접 승부합니다.</div>
         <div class="row" style="margin:10px 0"><button class="btn secondary" id="newBattle">새 Battle</button></div>
         <div class="choices"><button class="choice" data-choice="rock">✊</button><button class="choice" data-choice="paper">✋</button><button class="choice" data-choice="scissors">✌️</button></div>
-        <div class="result" id="battleResult">아직 3개 객체를 모으지 않았습니다.</div><div id="battleMonster" class="monster"></div><div id="monster" class="status">출전 Monster가 없습니다.</div><div class="status logBox" id="battleHistory">아직 Battle 결과가 없습니다.</div><button class="btn secondary logMore" data-log-target="battleHistory">더보기</button><div class="note" style="margin-top:8px">P3는 Personal Context가 확인된 경우에만 Rule Engine이 다음 상대 선택에 개입합니다. Context가 없으면 기존 Battle 로직을 그대로 사용합니다.</div>
+        <div class="result" id="battleResult">아직 3개 객체를 모으지 않았습니다.</div><div id="battleMonster" class="monster"></div><div id="monster" class="status">출전 Monster가 없습니다.</div><div class="status logBox" id="battleHistory">아직 Battle 결과가 없습니다.</div><button class="btn secondary logMore" data-log-target="battleHistory">더보기</button><div class="note" style="margin-top:8px">P3는 Personal Context가 확인된 경우에만 <b>상대팀 몬스터 선택</b>에 개입합니다. 우리팀 출전 Monster 선택에는 관여하지 않습니다.</div>
       </div>
     </section>
   </div>
@@ -56,7 +56,7 @@
   </section>
   <section class="card" style="margin-top:14px">
     <div class="sectionTitle"><h2>⑤ Personal Context → My AI</h2><span class="pill">P2 Minimal MVP</span></div>
-    <div id="contextCandidates" class="note">Evidence가 2회 이상 누적된 확정 객체에서 Personal Context 후보를 제안합니다.</div>
+    <div id="contextCandidates" class="note logBox">Evidence가 2회 이상 누적된 확정 객체에서 Personal Context 후보를 제안합니다.</div><button class="btn secondary logMore" data-log-target="contextCandidates">더보기</button>
     <div id="personalContexts" class="collection" style="margin-top:10px"></div>
     <div id="myAiResult" class="result" style="margin-top:10px">아직 확인된 Personal Context가 없습니다.</div>
     <div class="note" style="margin-top:8px">
@@ -64,14 +64,14 @@
       AI는 Context 후보를 제안하고, 사용자가 확인한 것만 Personal Context가 됩니다.
     </div>
   </section>
-  <section class="card" style="margin-top:14px"><div class="sectionTitle"><h2>⑥ Context-Driven AI Behavior</h2><span class="pill">P3 · Rule Engine</span></div><div class="note">Personal Context가 My AI의 다음 판단을 실제로 바꾸는지 검증합니다. 현재는 교체 가능한 Simple Rule Engine을 사용합니다.</div><div class="result" style="margin-top:10px"><b>현재 P3 엔진</b><br><span class="good">simple-0.1</span><br><span class="note">계약: Personal Context + Battle History + 후보 → 다음 판단 + 판단 근거</span></div><div class="note" style="margin-top:8px">Context가 없는 경우 기존 Battle과 동일하게 동작하고, Context가 있는 경우 과거에 놓친 개인 객체를 우선 선택합니다. 이후 Simple Rule Engine만 Huge Rule Engine으로 교체할 수 있습니다.</div></section>
+  <section class="card" style="margin-top:14px"><div class="sectionTitle"><h2>⑥ Context-Driven AI Behavior</h2><span class="pill">P3 · Rule Engine</span></div><div class="note">Personal Context가 My AI의 다음 판단을 실제로 바꾸는지 검증합니다. 현재는 교체 가능한 Simple Rule Engine을 사용합니다.</div><div class="result" style="margin-top:10px"><b>현재 P3 엔진</b><br><span class="good">simple-0.1</span><br><span class="note">계약: Personal Context + Battle History + 후보 → 다음 판단 + 판단 근거</span></div><div class="note" style="margin-top:8px">Context가 없는 경우 기존 Battle과 동일하게 동작하고, Context가 있는 경우 <b>상대팀</b>에서 과거에 놓친 개인 객체를 우선 선택합니다. 우리팀 출전 순서/선택은 P3 대상이 아닙니다. 이후 Simple Rule Engine만 Huge Rule Engine으로 교체할 수 있습니다.</div></section>
   <div class="footer">교육용 MVP입니다. 카메라/위치 권한이 필요하며, 현재 구현은 브라우저에서 모델 추론을 수행하고 Evidence를 localStorage에 저장합니다. Physical Object Identity는 현재 카메라 이미지의 간단한 시각적 fingerprint를 이용한 MVP 수준의 중복 판정입니다. 실제 배포 전에는 HTTPS, 개인정보 보호, 미성년자 동의/보호 절차, 모델/라이브러리 라이선스를 별도 검토해야 합니다.</div>
 </div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
 <script>
-const ARQ_SCHEMA_VERSION='0.4.2';
+const ARQ_SCHEMA_VERSION='0.4.3';
 const P3_RULE_ENGINE_VERSION='simple-0.1';
 const P3_RULE_ENGINE={version:P3_RULE_ENGINE_VERSION,evaluate({contexts,battles,candidates}){const confirmed=contexts.filter(c=>c.status==='CONFIRMED');if(!confirmed.length||!candidates.length)return {applied:false,selected:null,reason:'Personal Context 없음'};const scored=candidates.map(candidate=>{const context=confirmed.find(c=>c.physical_object_id===candidate.physical_object_id);if(!context)return {...candidate,score:0,reason:'Context 없음'};const stats=battleStatsFrom(battles,candidate.physical_object_id);const score=1+(stats.missed*3)+(stats.encounters*0.1);return {...candidate,score,context,stats,reason:stats.missed>0?'과거에 놓친 객체를 우선 재대결 대상으로 선택':'반복 관찰된 개인 객체를 우선 선택'};}).sort((a,b)=>b.score-a.score);const selected=scored[0];return {applied:true,selected,reason:selected.reason,engine:this.version};}};
 const PERSONAL_AI_SCHEMA={evidence:['id','object','confidence','time','location','zone','source','model','processing','human_feedback','context_ref','physical_object_id','visual_fingerprint'],context:['id','purpose','mission','situation','references','history'],rules:['id','when','condition','then','priority','source']};
@@ -169,10 +169,10 @@ function render(){
  $('collection').innerHTML=confirmed.length?confirmed.map(r=>{const st=objectStatsById(r.id),n=displayNameFor(r.id);return `<div class="obj"><div class="name">🔎 ${esc(n)}</div><small>${st.count} Evidence · 누적 관측 ${(st.avg*100).toFixed(1)}% · 최고 ${(st.best*100).toFixed(1)}%</small><div class="confirmed" style="margin-top:4px">확정 객체 · ${esc(r.id.slice(-6))}</div><div class="row" style="margin-top:7px"><button class="btn secondary historyBtn" data-id="${esc(r.id)}">Evidence History</button></div><div class="edit"><input value="${esc(n)}" aria-label="객체 이름 수정"><button class="btn secondary rename" data-id="${esc(r.id)}">수정</button></div></div>`}).join(''):'<div class="note">아직 확정된 객체가 없습니다.</div>';
  $('evidence').innerHTML=state.evidence.length?state.evidence.slice().reverse().map(e=>{const [label,cls]=confidenceLabel(Number(e.confidence||0));const n=e.user_label||e.object_key||e.ai_label||'OBJECT';return `<div class="ev"><b>${esc(n)}</b> · AI ${esc(e.ai_label||'unknown')} · ${(Number(e.confidence||0)*100).toFixed(1)}% · <span class="${cls}">${label}</span> · ${esc(e.zone||'Zone 없음')}<br>${new Date(e.time).toLocaleString()} · 개체 ${esc((e.physical_object_id||e.id).slice(-6))}<div class="edit"><input value="${esc(n)}" aria-label="객체 이름 수정"><button class="btn secondary evrename" data-id="${esc(e.id)}">수정</button></div></div>`}).join(''):'<div class="note">아직 Evidence가 없습니다.</div>';
  $('monsterCollection').innerHTML=state.monsters.length?state.monsters.slice().reverse().map((m,i)=>`<div class="obj"><div class="monster" style="font-size:48px">${monsterVisual(m)}</div><div class="name">${esc(m.name||m.object)} MONSTER</div><small>획득 ${new Date(m.time).toLocaleString()} · ${state.monsters.length-i}번째 Monster</small></div>`).join(''):'<div class="note">아직 수집한 Monster가 없습니다.</div>';
- $('battleHistory').innerHTML=state.battles.length?state.battles.slice().reverse().map(b=>`${new Date(b.time).toLocaleString()} · ${esc(b.actor||'고객')} · ${esc(b.result)} · ${b.acquired?esc(b.acquired)+' · ':''}<span class="${b.p3?.applied?'good':'note'}">${b.p3?.applied?'P3 개입':'P3 미개입'}</span>${b.p3?.reason?' · '+esc(b.p3.reason):''}`).join('<br>'):'아직 Battle 결과가 없습니다.';
+ $('battleHistory').innerHTML=state.battles.length?state.battles.slice().reverse().map(b=>`${new Date(b.time).toLocaleString()} · ${esc(b.actor||'고객')} · ${esc(b.result)} · ${b.acquired?esc(b.acquired)+' · ':''}<span class="${b.p3?.applied?'good':'note'}">${b.p3?.applied?'P3 개입':'P3 미개입'}</span>${b.missed?' · 놓침: '+esc(b.missed):''}${b.p3?.reason?' · '+esc(b.p3.reason):''}`).join('<br>'):'아직 Battle 결과가 없습니다.';
  $('battleMonster').innerHTML=state.monsters.length?state.monsters.slice(-3).reverse().map(m=>`<span title="${esc(m.name||m.object)}">${monsterVisual(m)}</span>`).join(' '):'🧌';
  $('monster').innerHTML=state.monsters.length?`현재 출전 후보 Monster 최대 3마리: ${state.monsters.slice(-3).map(m=>esc(m.name||m.object)).join(', ')}`:'출전 Monster가 없습니다.';
- document.querySelectorAll('.rename').forEach(btn=>btn.onclick=()=>renameObject(btn.dataset.id,btn.parentElement.querySelector('input').value));document.querySelectorAll('.logMore').forEach(btn=>btn.onclick=()=>{const box=$(btn.dataset.logTarget);box.classList.toggle('expanded');btn.textContent=box.classList.contains('expanded')?'접기':'더보기';});document.querySelectorAll('.historyBtn').forEach(btn=>btn.onclick=()=>openObjectHistory(btn.dataset.id));
+ document.querySelectorAll('.rename').forEach(btn=>btn.onclick=()=>renameObject(btn.dataset.id,btn.parentElement.querySelector('input').value));document.querySelectorAll('.logMore').forEach(btn=>btn.onclick=()=>{const box=$(btn.dataset.logTarget);box.classList.toggle('expanded');btn.textContent=box.classList.contains('expanded')?'감추기':'더보기';});document.querySelectorAll('.historyBtn').forEach(btn=>btn.onclick=()=>openObjectHistory(btn.dataset.id));
  document.querySelectorAll('.evrename').forEach(btn=>btn.onclick=()=>renameEvidence(btn.dataset.id,btn.parentElement.querySelector('input').value));
  $('gpsStatus').innerHTML=state.gps&&state.zone?`GPS: ${state.gps.lat.toFixed(6)}, ${state.gps.lon.toFixed(6)} · Zone: ${state.zone}`:'GPS/Zone: 아직 기록되지 않았습니다.';
  renderP2();document.querySelectorAll('.logMore').forEach(btn=>{const box=$(btn.dataset.logTarget);btn.style.display=box.scrollHeight>box.clientHeight?'inline-block':'none';});
@@ -265,7 +265,9 @@ function makeQuestMonster(q){const name=displayNameFor(q.physical_object_id);ret
 function makeCollectedMonster(target){const symbols=['🦊','🐉','🦖','🦉','🐙','🐺','🦄'];const used=new Set(state.monsters.map(m=>m.symbol).filter(Boolean));const available=symbols.filter(s=>!used.has(s));const pool=available.length?available:symbols;const symbol=pool[Math.floor(Math.random()*pool.length)];return {id:crypto.randomUUID(),name:target.name,object:target.name,time:new Date().toISOString(),symbol,physical_object_id:target.physical_object_id,species_key:canonicalBase(state.evidence.find(e=>e.physical_object_id===target.physical_object_id)?.ai_label||target.name),sourceEvidenceIds:state.evidence.filter(e=>e.physical_object_id===target.physical_object_id).map(e=>e.id),level:1,power:1,evidence_count:objectStatsById(target.physical_object_id).count}}
 function battle(choice){
  const quest=state.questObjects.map(q=>({...q}));
- const pending=state.battlePending;
+ let pending=state.battlePending;
+ if(pending?.actorType==='customer'&&state.monsters.length){pending=null;state.battlePending=null;}
+ if(pending?.actorType==='monster'&&!state.monsters.some(m=>m.id===pending.actorId)){pending=null;state.battlePending=null;}
  if(quest.length<3&&!pending){$('battleResult').textContent='다음 Battle을 시작하려면 새로운 객체 3개를 모아주세요.';return}
  state.battleUnlocked=true;
  const p3Selection=pending?{opponent:pending.opponent,decision:{applied:false,reason:'기존 Battle 진행 중'}}:p3SelectOpponent(quest);
@@ -282,8 +284,8 @@ function battle(choice){
  }
  const actorName=actor?actor.name||actor.object:playerNick();
  const actorChoice=choice,opponentChoice=Object.keys(beats)[Math.floor(Math.random()*3)],r=rpsResult(actorChoice,opponentChoice);
- const p3Info={applied:!!p3Selection.decision?.applied,engine:p3Selection.decision?.engine||P3_RULE_ENGINE_VERSION,reason:p3Selection.decision?.reason||'기존 Battle 진행 중',selectedPhysicalObjectId:opponent.physical_object_id||null}; const rec={time:new Date().toISOString(),actor:actorName,actorType,opponent:opponent.name,opponentPhysicalObjectId:opponent.physical_object_id||null,opponentType:'quest_monster',result:r,choice:actorChoice,ai:opponentChoice,acquired:null,questObjects:quest.map(q=>q.name),p3:p3Info};
- $('battleResult').innerHTML=`${esc(actorName)} ${labels[actorChoice]} · ${esc(opponent.name)} MONSTER ${labels[opponentChoice]} → <b class="${r==='WIN'?'good':r==='LOSE'?'bad':'warn'}">${r}</b><br><span class="${p3Info.applied?'good':'note'}">${p3Info.applied?'🤖 P3 Rule Engine 개입':'P3 Rule Engine 미개입'} · ${esc(p3Info.engine)} · ${esc(p3Info.reason)}</span>`;
+ const p3Info={applied:!!p3Selection.decision?.applied,target:'opponent',engine:p3Selection.decision?.engine||P3_RULE_ENGINE_VERSION,reason:p3Selection.decision?.reason||'기존 Battle 진행 중',selectedPhysicalObjectId:opponent.physical_object_id||null}; const rec={time:new Date().toISOString(),actor:actorName,actorType,opponent:opponent.name,opponentPhysicalObjectId:opponent.physical_object_id||null,opponentType:'quest_monster',result:r,choice:actorChoice,ai:opponentChoice,acquired:null,missed:null,questObjects:quest.map(q=>q.name),p3:p3Info};
+ $('battleResult').innerHTML=`<b>우리팀:</b> ${esc(actorName)} ${labels[actorChoice]} · <b>상대팀:</b> ${esc(opponent.name)} MONSTER ${labels[opponentChoice]} → <b class="${r==='WIN'?'good':r==='LOSE'?'bad':'warn'}">${r}</b><br><span class="${p3Info.applied?'good':'note'}">${p3Info.applied?'🤖 P3 Rule Engine 개입':'P3 Rule Engine 미개입'} · <b>대상: 상대팀 몬스터 선택</b> · ${esc(p3Info.engine)} · ${esc(p3Info.reason)}</span>`;
  if(r==='DRAW'){
   rec.message='무승부입니다. 다시 승부하세요.';state.battles.push(rec);state.battlePending={actorType,actorId:actor?.id||null,actorName,opponent};save();
   $('battleResult').innerHTML+=`<br><span class="warn">무승부입니다. 다시 승부하세요.</span>`;render();return;
@@ -295,6 +297,7 @@ function battle(choice){
   toast(`${monster.name} MONSTER 수집 완료!`);state.battles.push(rec);state.battlePending=null;state.questObjects=[];save();render();return;
  }
  // LOSE
+ rec.missed=opponent.name+' MONSTER';
  if(actorType==='collected_monster'&&actor){
   state.monsters=state.monsters.filter(x=>x.id!==actor.id);
   const candidates=state.monsters.slice(-3),next=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:null;
