@@ -97,9 +97,11 @@ test('battle flow uses the tested resolver', () => {
   assert.match(inlineScript[1], /state\.battlePending=pending/);
 });
 
-test('battle integration never sends the customer out while a team monster remains', () => {
+test('battle integration never sends the customer out while a team monster remains and resumes the same monster after a draw', () => {
   const battleMatch = inlineScript[1].match(/function battle\(choice\)\{[\s\S]*?\n\}/);
   assert.ok(battleMatch, 'battle function exists');
+  const teamMonsterA = { id: 'team-1', name: 'Team Monster A', object: 'Team Monster A' };
+  const teamMonsterB = { id: 'team-2', name: 'Team Monster B', object: 'Team Monster B' };
   const state = {
     questObjects: [
       { name: 'Quest A', physical_object_id: 'qa' },
@@ -109,11 +111,12 @@ test('battle integration never sends the customer out while a team monster remai
     battlePending: {
       actorType: 'customer', actorId: null, actorName: '고객', opponent
     },
-    monsters: [{ id: 'team-1', name: 'Team Monster', object: 'Team Monster' }],
+    monsters: [teamMonsterA, teamMonsterB],
     battleUnlocked: true,
     battles: []
   };
   const battleResultElement = { textContent: '', innerHTML: '' };
+  let randomValue = 0;
   const sandbox = {
     state,
     resolveBattleActor,
@@ -125,16 +128,32 @@ test('battle integration never sends the customer out while a team monster remai
     beats: { rock: 'scissors', paper: 'rock', scissors: 'paper' },
     rpsResult: (a, b) => a === b ? 'DRAW' : ({ rock: 'scissors', paper: 'rock', scissors: 'paper' })[a] === b ? 'WIN' : 'LOSE',
     esc: String,
-    Math: { random: () => 0 },
+    Math: { random: () => randomValue },
+    makeCollectedMonster: target => ({ id: 'captured', name: target.name, physical_object_id: target.physical_object_id }),
     save: () => {},
     render: () => {},
     toast: () => {}
   };
   vm.runInNewContext(battleMatch[0] + '\nthis.battle = battle;', sandbox);
-  sandbox.battle('rock');
-  assert.equal(state.battles.length, 1);
-  assert.equal(state.battles[0].actor, 'Team Monster');
+
+  sandbox.battle('rock'); // rock vs rock => DRAW
+  assert.equal(state.battles[0].actor, 'Team Monster A');
   assert.equal(state.battles[0].actorType, 'collected_monster');
-  assert.equal(state.battlePending.actorType, 'monster');
   assert.equal(state.battlePending.actorId, 'team-1');
+
+  randomValue = 0.99; // If pending identity is lost, this would select Monster B.
+  sandbox.battle('rock'); // rock beats scissors => WIN
+  assert.equal(state.battles[1].actor, 'Team Monster A');
+  assert.equal(state.battles[1].actorType, 'collected_monster');
+  assert.notEqual(state.battles[1].actor, '고객');
+  assert.ok(state.monsters.some(m => m.id === 'team-2'), 'the other team monster remains available');
+});
+
+test('legacy collected_monster pending state resumes its exact actor', () => {
+  const result = resolveBattleActor([monsterA, monsterB], {
+    actorType: 'collected_monster', actorId: 'b', opponent
+  });
+  assert.equal(result.actor, monsterB);
+  assert.equal(result.actorType, 'collected_monster');
+  assert.equal(result.pending.actorType, 'collected_monster');
 });
