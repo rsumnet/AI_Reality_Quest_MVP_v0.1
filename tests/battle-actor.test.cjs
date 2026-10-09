@@ -96,3 +96,45 @@ test('battle flow uses the tested resolver', () => {
   assert.match(inlineScript[1], /resolveBattleActor\(state\.monsters,state\.battlePending\)/);
   assert.match(inlineScript[1], /state\.battlePending=pending/);
 });
+
+test('battle integration never sends the customer out while a team monster remains', () => {
+  const battleMatch = inlineScript[1].match(/function battle\(choice\)\{[\s\S]*?\n\}/);
+  assert.ok(battleMatch, 'battle function exists');
+  const state = {
+    questObjects: [
+      { name: 'Quest A', physical_object_id: 'qa' },
+      { name: 'Quest B', physical_object_id: 'qb' },
+      { name: 'Quest C', physical_object_id: 'qc' }
+    ],
+    battlePending: {
+      actorType: 'customer', actorId: null, actorName: '고객', opponent
+    },
+    monsters: [{ id: 'team-1', name: 'Team Monster', object: 'Team Monster' }],
+    battleUnlocked: true,
+    battles: []
+  };
+  const battleResultElement = { textContent: '', innerHTML: '' };
+  const sandbox = {
+    state,
+    resolveBattleActor,
+    $: () => battleResultElement,
+    playerNick: () => '고객',
+    p3SelectOpponent: () => ({ opponent, decision: { applied: false, reason: 'test' } }),
+    P3_RULE_ENGINE_VERSION: 'simple-0.1',
+    labels: { rock: 'rock', paper: 'paper', scissors: 'scissors' },
+    beats: { rock: 'scissors', paper: 'rock', scissors: 'paper' },
+    rpsResult: (a, b) => a === b ? 'DRAW' : ({ rock: 'scissors', paper: 'rock', scissors: 'paper' })[a] === b ? 'WIN' : 'LOSE',
+    esc: String,
+    Math: { random: () => 0 },
+    save: () => {},
+    render: () => {},
+    toast: () => {}
+  };
+  vm.runInNewContext(battleMatch[0] + '\nthis.battle = battle;', sandbox);
+  sandbox.battle('rock');
+  assert.equal(state.battles.length, 1);
+  assert.equal(state.battles[0].actor, 'Team Monster');
+  assert.equal(state.battles[0].actorType, 'collected_monster');
+  assert.equal(state.battlePending.actorType, 'monster');
+  assert.equal(state.battlePending.actorId, 'team-1');
+});
