@@ -4,21 +4,21 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 const html = fs.readFileSync('index.html', 'utf8');
-const inlineScript = html.match(/<script>([\\s\\S]*?)<\\/script>/);
+const inlineScript = html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(inlineScript, 'inline application script exists');
 new vm.Script(inlineScript[1], { filename: 'index.html inline script' });
 
 test('visible app version, document title, and evidence schema version agree', () => {
-  assert.match(html, /<title>AI Reality Quest — MVP v0\\.4\\.5<\\/title>/);
-  assert.match(html, /MVP v0\\.4\\.5 · Browser \/ On-device inference/);
-  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\\.4\\.5';/);
-  assert.doesNotMatch(html, /v0\\.4\\.[0-4](?:\\D|$)/);
+  assert.match(html, /<title>AI Reality Quest — MVP v0\.4\.5<\/title>/);
+  assert.match(html, /MVP v0\.4\.5 · Browser \/ On-device inference/);
+  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.4\.5';/);
+  assert.doesNotMatch(html, /v0\.4\.[0-4](?:\D|$)/);
 });
 
-const helperMatch = inlineScript[1].match(/function resolveBattleActor\\(monsters,pending\\)\\{[\\s\\S]*?\\n\\}/);
+const helperMatch = inlineScript[1].match(/function resolveBattleActor\(monsters,pending\)\{[\s\S]*?\n\}/);
 assert.ok(helperMatch, 'battle actor resolver exists');
 const sandbox = {};
-vm.runInNewContext(helperMatch[0] + '\\nthis.resolveBattleActor = resolveBattleActor;', sandbox);
+vm.runInNewContext(helperMatch[0] + '\nthis.resolveBattleActor = resolveBattleActor;', sandbox);
 const resolveBattleActor = sandbox.resolveBattleActor;
 const monsterA = { id: 'a', name: 'A' };
 const monsterB = { id: 'b', name: 'B' };
@@ -93,6 +93,6 @@ test('invalid null entries cannot hide a valid team monster', () => {
 });
 
 test('battle flow uses the tested resolver', () => {
-  assert.match(inlineScript[1], /resolveBattleActor\\(state\\.monsters,state\\.battlePending\\)/);
-  assert.match(inlineScript[1], /state\\.battlePending=pending/);
+  assert.match(inlineScript[1], /resolveBattleActor\(state\.monsters,state\.battlePending\)/);
+  assert.match(inlineScript[1], /state\.battlePending=pending/);
 });
