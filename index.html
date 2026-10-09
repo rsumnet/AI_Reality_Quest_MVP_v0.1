@@ -265,7 +265,7 @@ function makeQuestMonster(q){const name=displayNameFor(q.physical_object_id);ret
 function makeCollectedMonster(target){const symbols=['🦊','🐉','🦖','🦉','🐙','🐺','🦄'];const used=new Set(state.monsters.map(m=>m.symbol).filter(Boolean));const available=symbols.filter(s=>!used.has(s));const pool=available.length?available:symbols;const symbol=pool[Math.floor(Math.random()*pool.length)];return {id:crypto.randomUUID(),name:target.name,object:target.name,time:new Date().toISOString(),symbol,physical_object_id:target.physical_object_id,species_key:canonicalBase(state.evidence.find(e=>e.physical_object_id===target.physical_object_id)?.ai_label||target.name),sourceEvidenceIds:state.evidence.filter(e=>e.physical_object_id===target.physical_object_id).map(e=>e.id),level:1,power:1,evidence_count:objectStatsById(target.physical_object_id).count}}
 function resolveBattleActor(monsters,pending){
  const team=Array.isArray(monsters)?monsters.filter(m=>m&&typeof m==='object'):[];
- if(pending?.actorType==='monster'){
+ if(pending?.actorType==='monster'||pending?.actorType==='collected_monster'){
   const actor=team.find(m=>m.id===pending.actorId);
   if(actor)return {actor,actorType:'collected_monster',pending,resumed:true,candidates:team};
  }
