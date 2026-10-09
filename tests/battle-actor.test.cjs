@@ -128,7 +128,7 @@ test('battle integration never sends the customer out while a team monster remai
     beats: { rock: 'scissors', paper: 'rock', scissors: 'paper' },
     rpsResult: (a, b) => a === b ? 'DRAW' : ({ rock: 'scissors', paper: 'rock', scissors: 'paper' })[a] === b ? 'WIN' : 'LOSE',
     esc: String,
-    Math: { random: () => randomValue },
+    Math: { random: () => randomValue, floor: Math.floor },
     makeCollectedMonster: target => ({ id: 'captured', name: target.name, physical_object_id: target.physical_object_id }),
     save: () => {},
     render: () => {},
