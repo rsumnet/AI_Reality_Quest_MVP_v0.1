@@ -183,20 +183,20 @@ test('P3 does not intervene on a first encounter and requires a prior loss for t
     isConfirmedId: () => true,
     battleStatsFrom: (battles, id) => {
       const matches = battles.filter(b => b.opponentPhysicalObjectId === id);
-      return { missed: matches.filter(b => b.result === 'LOSE').length, collected: matches.filter(b => b.result === 'WIN').length, encounters: matches.length };
+      return { missed: matches.filter(b => b.result === 'LOSE').length, collected: matches.filter(b => b.result === 'WIN').length, encounters: matches.length, ownMonsterLosses: battles.filter(x => x.actorPhysicalObjectId === id && x.actorType === 'collected_monster' && x.result === 'LOSE').length };
     }
   };
   vm.runInNewContext(definition + '\nthis.P3_RULE_ENGINE = P3_RULE_ENGINE;', sandbox);
   const context = { status: 'CONFIRMED', physical_object_id: 'object-A' };
   const candidate = { name: 'Object A', physical_object_id: 'object-A' };
   const first = sandbox.P3_RULE_ENGINE.evaluate({ contexts: [context], battles: [], candidates: [candidate] });
-  assert.equal(first.applied, false, 'no prior loss means P3 must not intervene');
+  assert.equal(first.applied, false, 'a first win/capture without losing the own Monster later must not trigger P3');
   const afterLoss = sandbox.P3_RULE_ENGINE.evaluate({
     contexts: [context],
-    battles: [{ opponentPhysicalObjectId: 'object-A', result: 'LOSE' }],
+    battles: [{ actorPhysicalObjectId: 'object-A', actorType: 'collected_monster', opponentPhysicalObjectId: 'object-B', result: 'LOSE' }],
     candidates: [candidate]
   });
-  assert.equal(afterLoss.applied, true, 'the previously missed context object becomes eligible on a later Quest');
+  assert.equal(afterLoss.applied, true, 'the My AI object becomes eligible only after its own Monster is lost in battle');
   assert.equal(afterLoss.selected.physical_object_id, 'object-A');
 });
 
@@ -208,4 +208,10 @@ test('Quest prompt changes automatically when the third confirmed object is adde
 test('win and loss messages identify both monsters and the collection change', () => {
   assert.match(inlineScript[1], /\$\{esc\(actorName\)\}가 \$\{esc\(opponent\.name\)\}을 이겨서 Monster Collection에 \$\{esc\(opponent\.name\)\}를 수집하였습니다/);
   assert.match(inlineScript[1], /\$\{esc\(actorName\)\}가 \$\{esc\(opponent\.name\)\}에게 져서 Monster Collection에서 \$\{esc\(actorName\)\}이 사라졌습니다/);
+});
+
+test('battle records the physical identity of our Monster so a later loss can trigger P3 on re-scan', () => {
+  assert.match(inlineScript[1], /actorPhysicalObjectId:actor\?\.physical_object_id\|\|null/);
+  assert.match(inlineScript[1], /b\.actorPhysicalObjectId===id&&b\.actorType==='collected_monster'&&b\.result==='LOSE'/);
+  assert.match(inlineScript[1], /x\.battleStats\.ownMonsterLosses>0/);
 });
