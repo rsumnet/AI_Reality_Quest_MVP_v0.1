@@ -10,7 +10,7 @@ function loadModules() {
   }) } };
   sandbox.window = sandbox;
   vm.runInNewContext(fs.readFileSync('games/game-registry.js', 'utf8'), sandbox, { filename: 'games/game-registry.js' });
-  for (const path of ['games/rps.js', 'games/odd-even.js']) {
+  for (const path of ['games/rps.js', 'games/odd-even.js', 'games/dice.js']) {
     vm.runInNewContext(fs.readFileSync(path, 'utf8'), sandbox, { filename: path });
   }
   return sandbox;
@@ -18,9 +18,10 @@ function loadModules() {
 
 test('registry exposes independently registered RPS and odd-even modules', () => {
   const sandbox = loadModules();
-  assert.equal(sandbox.ARQGameRegistry.list().length, 2);
+  assert.equal(sandbox.ARQGameRegistry.list().length, 3);
   assert.equal(sandbox.ARQGameRegistry.list()[0].id, 'rps');
   assert.equal(sandbox.ARQGameRegistry.list()[1].id, 'odd-even');
+  assert.equal(sandbox.ARQGameRegistry.list()[2].id, 'dice');
   assert.equal(sandbox.ARQGameRegistry.get('rps').name, '가위바위보');
   assert.equal(sandbox.ARQGameRegistry.get('odd-even').name, '홀짝');
 });
@@ -70,4 +71,14 @@ test('a student-created asynchronous game can submit a normalized result directl
   custom.solve();
   assert.equal(hostActions[0].result, 'WIN');
   assert.equal(hostActions[0].metadata.gameId, 'student-sudoku');
+});
+
+test('dice module resolves win, loss, and draw through the same normalized contract', () => {
+  const game = loadModules().ARQGameRegistry.get('dice');
+  const values = sequence => { let i = 0; return () => sequence[i++]; };
+  assert.equal(game.resolveRound('roll', { random: values([0.99, 0]) }).result, 'WIN');
+  assert.equal(game.resolveRound('roll', { random: values([0, 0.99]) }).result, 'LOSE');
+  const draw = game.resolveRound('roll', { random: values([0.5, 0.5]) });
+  assert.equal(draw.result, 'DRAW');
+  assert.equal(draw.metadata.gameId, 'dice');
 });
