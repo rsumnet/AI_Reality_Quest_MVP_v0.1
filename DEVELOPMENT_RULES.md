@@ -75,6 +75,10 @@ If a test fails, the AI should investigate and repair the failure before handing
 - The customer may enter an ongoing battle only after no valid team Monster remains.
 - A new battle without a pending opponent still requires the Quest precondition.
 - P3 may influence only opponent selection; it must not influence our team's fighter selection.
+- P3 must not prioritize a Personal Context object merely because it is recognized or being captured for the first time.
+- P3 may prioritize a previously captured My AI context object only after that exact team's Monster has lost a battle and been removed from Monster Collection, and the object is later re-observed and re-enters a new Quest.
+- Battle history must persist the active team's Monster physical-object ID so its loss can be distinguished from failing to capture an opponent.
+- Once an object's cumulative evidence has reached the 75% confirmation threshold, later low-confidence observations must not revoke its confirmed status.
 - Persisted pending state from older versions must be normalized safely.
 
 These conditions must be tested as state-transition cases, not only inspected visually.
