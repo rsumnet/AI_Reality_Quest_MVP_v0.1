@@ -184,6 +184,7 @@ test('P3 does not intervene on a first encounter and requires losing the same co
   assert.ok(start >= 0 && end > start, 'P3 engine definition exists');
   const definition = script.slice(start, end).trim();
   const sandbox = {
+    P3_RULE_ENGINE_VERSION: 'simple-0.1',
     objectStatsById: () => ({ count: 3, avg: 0.9, best: 0.95 }),
     isConfirmedId: () => true,
     battleStatsFrom: (battles, id) => {
