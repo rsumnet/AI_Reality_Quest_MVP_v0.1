@@ -9,9 +9,9 @@ assert.ok(inlineScript, 'inline application script exists');
 new vm.Script(inlineScript[1], { filename: 'index.html inline script' });
 
 test('visible app version, document title, and evidence schema version agree', () => {
-  assert.match(html, /<title>AI Reality Quest — MVP v0\.4\.6<\/title>/);
-  assert.match(html, /MVP v0\.4\.6 · Browser \/ On-device inference/);
-  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.4\.6';/);
+  assert.match(html, /<title>AI Reality Quest — MVP v0\.4\.7<\/title>/);
+  assert.match(html, /MVP v0\.4\.7 · Browser \/ On-device inference/);
+  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.4\.7';/);
   assert.doesNotMatch(html, /v0\.4\.[0-5](?:\D|$)/);
 });
 
@@ -123,10 +123,11 @@ test('battle integration never sends the customer out while a team monster remai
     $: () => battleResultElement,
     playerNick: () => '고객',
     p3SelectOpponent: () => ({ opponent, decision: { applied: false, reason: 'test' } }),
+    selectedGame: () => ({ id: 'rps', name: '가위바위보', resolveRound: (a, { random }) => {
+      const b = ['rock', 'paper', 'scissors'][Math.floor(random() * 3)];
+      return { result: a === b ? 'DRAW' : ({ rock: 'scissors', paper: 'rock', scissors: 'paper' })[a] === b ? 'WIN' : 'LOSE', playerAction: a, opponentAction: b };
+    } }),
     P3_RULE_ENGINE_VERSION: 'simple-0.1',
-    labels: { rock: 'rock', paper: 'paper', scissors: 'scissors' },
-    beats: { rock: 'scissors', paper: 'rock', scissors: 'paper' },
-    rpsResult: (a, b) => a === b ? 'DRAW' : ({ rock: 'scissors', paper: 'rock', scissors: 'paper' })[a] === b ? 'WIN' : 'LOSE',
     esc: String,
     Math: { random: () => randomValue, floor: Math.floor },
     makeCollectedMonster: target => ({ id: 'captured', name: target.name, physical_object_id: target.physical_object_id }),
@@ -227,4 +228,33 @@ test('battle records the physical identity of our Monster so a later loss can tr
   assert.ok(inlineScript[1].includes('actorPhysicalObjectId:actor?.physical_object_id||null'));
   assert.ok(inlineScript[1].includes("b.actorPhysicalObjectId===id&&b.actorType==='collected_monster'&&b.result==='LOSE'"));
   assert.ok(inlineScript[1].includes('x.battleStats.ownMonsterLosses>0'));
+});
+
+test('a loss of our collected My AI Monster is counted as one missed/lost event', () => {
+  const start = inlineScript[1].indexOf('function battleStatsFrom(battles,id){');
+  const end = inlineScript[1].indexOf('\nfunction p2ContextText', start);
+  assert.ok(start >= 0 && end > start, 'battle stats function exists');
+  const sandbox = {};
+  vm.runInNewContext(inlineScript[1].slice(start, end) + '\nthis.battleStatsFrom=battleStatsFrom;', sandbox);
+  const stats = sandbox.battleStatsFrom([
+    { actorPhysicalObjectId: 'my-ai-object', actorType: 'collected_monster', result: 'LOSE', opponentPhysicalObjectId: 'other' }
+  ], 'my-ai-object');
+  assert.equal(stats.ownMonsterLosses, 1);
+  assert.equal(stats.missed, 1, 'loss from our collection must also be visible as one missed/lost event');
+  assert.equal(stats.opponentMisses, 0, 'the own-Monster loss remains distinguishable from failing to capture an opponent');
+});
+
+test('battle records the lost My AI object identity and a readable missed/lost event', () => {
+  assert.match(inlineScript[1], /actorPhysicalObjectId:actor\?\.physical_object_id\|\|null/);
+  assert.match(inlineScript[1], /rec\.missed=actorName\+' MONSTER';rec\.lostFromCollection=\{monsterId:actor\.id,physical_object_id:actor\.physical_object_id\|\|null,name:actorName\}/);
+  assert.match(inlineScript[1], /if\(b\.actorPhysicalObjectId===id&&b\.actorType==='collected_monster'&&b\.result==='LOSE'\)\{ownMonsterLosses\+\+;missed\+\+;\}/);
+});
+
+test('Quest games are loaded from replaceable modules rather than hard-coded RPS buttons', () => {
+  assert.match(html, /games\/game-registry\.js/);
+  assert.match(html, /games\/rps\.js/);
+  assert.match(html, /games\/odd-even\.js/);
+  assert.match(html, /id="gameSelector"/);
+  assert.match(html, /game\.renderControls\(\$\('gameControls'\),action=>battle\(action\)/);
+  assert.match(inlineScript[1], /game\.resolveRound\(choice,\{actor,actorType,opponent,quest,random:Math\.random\}\)/);
 });
