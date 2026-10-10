@@ -256,6 +256,7 @@ test('Quest games are loaded from replaceable modules rather than hard-coded RPS
   assert.match(html, /games\/game-registry\.js/);
   assert.match(html, /games\/rps\.js/);
   assert.match(html, /games\/odd-even\.js/);
+  assert.match(html, /games\/dice\.js/);
   assert.match(html, /id="gameSelector"/);
   assert.match(html, /game\.renderControls\(\$\('gameControls'\),action=>battle\(action\)/);
   assert.match(inlineScript[1], /game\.resolveRound\(choice,\{actor,actorType,opponent,quest,random:Math\.random\}\)/);
