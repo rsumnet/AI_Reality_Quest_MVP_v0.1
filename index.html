@@ -73,7 +73,7 @@
 <script>
 const ARQ_SCHEMA_VERSION='0.4.6';
 const P3_RULE_ENGINE_VERSION='simple-0.1';
-const P3_RULE_ENGINE={version:P3_RULE_ENGINE_VERSION,evaluate({contexts,battles,candidates}){const confirmed=contexts.filter(c=>c.status==='CONFIRMED');if(!confirmed.length||!candidates.length)return {applied:false,selected:null,reason:'Personal Context 없음'};const eligible=confirmed.map(context=>{const id=context.physical_object_id;const stats=objectStatsById(id);const battleStats=battleStatsFrom(battles,id);return {context,evidenceCount:stats.count,confirmed:isConfirmedId(id),battleStats};}).filter(x=>x.evidenceCount>=2&&x.confirmed&&x.battleStats.missed>0).map(x=>x.context);if(!eligible.length)return {applied:false,selected:null,reason:'현재 P3 개입 가능한 Personal Context 없음'};const scored=candidates.map(candidate=>{const context=eligible.find(c=>c.physical_object_id===candidate.physical_object_id);if(!context)return null;const stats=battleStatsFrom(battles,candidate.physical_object_id);const score=1+(stats.missed*3)+(stats.encounters*0.1);return {...candidate,score,context,stats,reason:stats.missed>0?'과거에 놓친 객체를 우선 재대결 대상으로 선택':'반복 관찰된 개인 객체를 우선 선택'};}).filter(Boolean).sort((a,b)=>b.score-a.score);if(!scored.length)return {applied:false,selected:null,reason:confirmed.some(c=>battleStatsFrom(battles,c.physical_object_id).missed===0)?'과거 패배 기록이 있는 Personal Context 객체 없음':'현재 상대 후보 중 Personal Context 객체 없음'};const selected=scored[0];return {applied:true,selected,reason:selected.reason,engine:this.version};}};
+const P3_RULE_ENGINE={version:P3_RULE_ENGINE_VERSION,evaluate({contexts,battles,candidates}){const confirmed=contexts.filter(c=>c.status==='CONFIRMED');if(!confirmed.length||!candidates.length)return {applied:false,selected:null,reason:'Personal Context 없음'};const eligible=confirmed.map(context=>{const id=context.physical_object_id;const stats=objectStatsById(id);const battleStats=battleStatsFrom(battles,id);return {context,evidenceCount:stats.count,confirmed:isConfirmedId(id),battleStats};}).filter(x=>x.evidenceCount>=2&&x.confirmed&&x.battleStats.ownMonsterLosses>0).map(x=>x.context);if(!eligible.length)return {applied:false,selected:null,reason:'My AI 객체가 우리팀에서 패배해 사라진 기록 없음'};const scored=candidates.map(candidate=>{const context=eligible.find(c=>c.physical_object_id===candidate.physical_object_id);if(!context)return null;const stats=battleStatsFrom(battles,candidate.physical_object_id);const score=1+(stats.ownMonsterLosses*3)+(stats.encounters*0.1);return {...candidate,score,context,stats,reason:'우리팀에서 패배해 잃은 My AI 객체를 우선 재선택'};}).filter(Boolean).sort((a,b)=>b.score-a.score);if(!scored.length)return {applied:false,selected:null,reason:confirmed.some(c=>battleStatsFrom(battles,c.physical_object_id).missed===0)?'과거 패배 기록이 있는 Personal Context 객체 없음':'현재 상대 후보 중 Personal Context 객체 없음'};const selected=scored[0];return {applied:true,selected,reason:selected.reason,engine:this.version};}};
 const PERSONAL_AI_SCHEMA={evidence:['id','object','confidence','time','location','zone','source','model','processing','human_feedback','context_ref','physical_object_id','visual_fingerprint'],context:['id','purpose','mission','situation','references','history'],rules:['id','when','condition','then','priority','source']};
 const state={model:null,stream:null,last:null,personalContexts:JSON.parse(localStorage.getItem('arq_personal_contexts')||'[]'),zone:localStorage.getItem('arq_zone')||null,gps:JSON.parse(localStorage.getItem('arq_gps')||'null'),evidence:JSON.parse(localStorage.getItem('arq_evidence')||'[]'),monsters:JSON.parse(localStorage.getItem('arq_monsters')||'[]'),battles:JSON.parse(localStorage.getItem('arq_battles')||'[]'),attempts:JSON.parse(localStorage.getItem('arq_attempts')||'[]'),battlePending:JSON.parse(localStorage.getItem('arq_battle_pending')||'null'),battleUnlocked:localStorage.getItem('arq_battle_unlocked')==='1',questObjects:JSON.parse(localStorage.getItem('arq_quest_objects')||'[]').map(q=>typeof q==='string'?{name:q,physical_object_id:null}:q),selectedObjectId:null,selectedEvidenceId:null};state.battleUnlocked=state.battleUnlocked||state.questObjects.length>=3;
 
@@ -109,14 +109,15 @@ function p2BattleStats(id){
   return battleStatsFrom(state.battles,id);
 }
 function battleStatsFrom(battles,id){
-  let collected=0,missed=0,encounters=0;
+  let collected=0,missed=0,encounters=0,ownMonsterLosses=0;
   for(const b of battles){
+    if(b.actorPhysicalObjectId===id&&b.actorType==='collected_monster'&&b.result==='LOSE')ownMonsterLosses++;
     if(b.opponentPhysicalObjectId!==id)continue;
     encounters++;
     if(b.result==='WIN')collected++;
     if(b.result==='LOSE')missed++;
   }
-  return {collected,missed,encounters};
+  return {collected,missed,encounters,ownMonsterLosses};
 }
 function p2ContextText(c){
   const s=p2BattleStats(c.physical_object_id);
@@ -296,7 +297,7 @@ function battle(choice){
  const opponent=p3Selection.opponent;
  const actorName=actor?actor.name||actor.object:playerNick();
  const actorChoice=choice,opponentChoice=Object.keys(beats)[Math.floor(Math.random()*3)],r=rpsResult(actorChoice,opponentChoice);
- const p3Info={applied:!!p3Selection.decision?.applied,target:'opponent',engine:p3Selection.decision?.engine||P3_RULE_ENGINE_VERSION,reason:p3Selection.decision?.reason||'기존 Battle 진행 중',selectedPhysicalObjectId:opponent.physical_object_id||null}; const rec={time:new Date().toISOString(),actor:actorName,actorType,opponent:opponent.name,opponentPhysicalObjectId:opponent.physical_object_id||null,opponentType:'quest_monster',result:r,choice:actorChoice,ai:opponentChoice,acquired:null,missed:null,questObjects:quest.map(q=>q.name),p3:p3Info};
+ const p3Info={applied:!!p3Selection.decision?.applied,target:'opponent',engine:p3Selection.decision?.engine||P3_RULE_ENGINE_VERSION,reason:p3Selection.decision?.reason||'기존 Battle 진행 중',selectedPhysicalObjectId:opponent.physical_object_id||null}; const rec={time:new Date().toISOString(),actor:actorName,actorType,actorPhysicalObjectId:actor?.physical_object_id||null,opponent:opponent.name,opponentPhysicalObjectId:opponent.physical_object_id||null,opponentType:'quest_monster',result:r,choice:actorChoice,ai:opponentChoice,acquired:null,missed:null,questObjects:quest.map(q=>q.name),p3:p3Info};
  $('battleResult').innerHTML=`<b>우리팀:</b> ${esc(actorName)} ${labels[actorChoice]} · <b>상대팀:</b> ${esc(opponent.name)} MONSTER ${labels[opponentChoice]} → <b class="${r==='WIN'?'good':r==='LOSE'?'bad':'warn'}">${r}</b><br><span class="${p3Info.applied?'good':'note'}">${p3Info.applied?'🤖 P3 Rule Engine 개입':'P3 Rule Engine 미개입'} · <b>대상: 상대팀 몬스터 선택</b> · ${esc(p3Info.engine)} · ${esc(p3Info.reason)}</span>`;
  if(r==='DRAW'){
   rec.message='무승부입니다. 다시 승부하세요.';state.battles.push(rec);state.battlePending={actorType,actorId:actor?.id||null,actorName,opponent};save();
