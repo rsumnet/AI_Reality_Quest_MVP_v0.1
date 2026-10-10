@@ -98,7 +98,9 @@ test('battle flow uses the tested resolver', () => {
 });
 
 test('battle integration never sends the customer out while a team monster remains and resumes the same monster after a draw', () => {
+  const outcomeMatch = inlineScript[1].match(/function handleGameOutcome\(\{[\s\S]*?\n\}/);
   const battleMatch = inlineScript[1].match(/function battle\(choice\)\{[\s\S]*?\n\}/);
+  assert.ok(outcomeMatch, 'shared Quest outcome handler exists');
   assert.ok(battleMatch, 'battle function exists');
   const teamMonsterA = { id: 'team-1', name: 'Team Monster A', object: 'Team Monster A' };
   const teamMonsterB = { id: 'team-2', name: 'Team Monster B', object: 'Team Monster B' };
@@ -135,7 +137,7 @@ test('battle integration never sends the customer out while a team monster remai
     render: () => {},
     toast: () => {}
   };
-  vm.runInNewContext(battleMatch[0] + '\nthis.battle = battle;', sandbox);
+  vm.runInNewContext(outcomeMatch[0] + '\n' + battleMatch[0] + '\nthis.battle = battle;', sandbox);
 
   sandbox.battle('rock'); // rock vs rock => DRAW
   assert.equal(state.battles[0].actor, 'Team Monster A');
