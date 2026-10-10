@@ -260,3 +260,33 @@ test('Quest games are loaded from replaceable modules rather than hard-coded RPS
   assert.match(html, /game\.renderControls\(\$\('gameControls'\),action=>battle\(action\)/);
   assert.match(inlineScript[1], /game\.resolveRound\(choice,\{actor,actorType,opponent,quest,random:Math\.random\}\)/);
 });
+
+test('losing the first collected My AI Monster persists its identity and increments missed exactly once', () => {
+  const handler = inlineScript[1].match(/function handleGameOutcome\(\{[\s\S]*?\n\}/);
+  const stats = inlineScript[1].match(/function battleStatsFrom\(battles,id\)\{[\s\S]*?\n\}/);
+  assert.ok(handler && stats, 'shared outcome and stats handlers exist');
+  const actor = { id: 'monster-1', name: 'Fire Hydrant', object: 'Fire Hydrant', physical_object_id: 'my-ai-fire-hydrant' };
+  const opponent = { name: 'Street Sign', physical_object_id: 'quest-street-sign' };
+  const resultElement = { innerHTML: '', textContent: '' };
+  const state = { monsters: [actor], battles: [], questObjects: [{}, {}, {}], battlePending: null };
+  const sandbox = {
+    state, playerNick: () => 'Customer', esc: String, $: () => resultElement,
+    makeCollectedMonster: () => ({}), save: () => {}, render: () => {}, toast: () => {},
+    Math: { floor: Math.floor, random: () => 0 }
+  };
+  vm.runInNewContext(handler[0] + '\n' + stats[0] + '\nthis.handleGameOutcome=handleGameOutcome;this.battleStatsFrom=battleStatsFrom;', sandbox);
+  sandbox.handleGameOutcome({
+    choice: 'rock', game: { id: 'rps', name: '가위바위보' }, actor, actorType: 'collected_monster', opponent,
+    p3Info: { applied: false, engine: 'simple-0.1', reason: 'test' },
+    quest: [{ name: 'A' }, { name: 'B' }, { name: 'C' }],
+    gameOutcome: { result: 'LOSE', playerAction: '바위', opponentAction: '보' }
+  });
+  assert.equal(state.monsters.length, 0, 'lost Monster is removed from collection');
+  assert.equal(state.battles.length, 1, 'loss is persisted to Battle History');
+  assert.equal(state.battles[0].actorPhysicalObjectId, 'my-ai-fire-hydrant');
+  assert.equal(state.battles[0].missed, 'Fire Hydrant MONSTER');
+  assert.equal(state.battles[0].lostFromCollection.physical_object_id, 'my-ai-fire-hydrant');
+  const totals = sandbox.battleStatsFrom(state.battles, 'my-ai-fire-hydrant');
+  assert.equal(totals.ownMonsterLosses, 1);
+  assert.equal(totals.missed, 1);
+});
