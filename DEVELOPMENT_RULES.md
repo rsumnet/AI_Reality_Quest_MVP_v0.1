@@ -20,7 +20,7 @@ The goal is not to maximize the human's coding output. It is to establish the mi
 2. **Define the expected behavior first.** Every bug fix must state the invariant or acceptance condition it must satisfy.
 3. **Smallest sufficient change.** Fix the cause, not just the visible symptom. Do not add features, abstractions, dependencies, or duplicate state unless they materially improve correctness or testability.
 4. **Inspect before editing.** Read the current branch, commit, affected code, persisted-state shape, and relevant history before proposing a patch.
-5. **Protect existing behavior.** Identify nearby P0/P1/P2/P3 paths and add regression tests for behavior that must not change.
+5. **Protect the whole connected behavior chain.** A requested change includes every dependent writer, reader, state transition, UI message, persistence path, history/statistic, and downstream rule affected by it—not only the named line or screen. Trace the end-to-end data flow, preserve unrelated behavior, and add regression tests for both the requested change and adjacent invariants.
 6. **AI verifies its own work.** Run syntax checks, unit tests, integration tests, version checks, and CI where applicable before asking the human to test.
 7. **A failed check blocks completion claims.** Fix the failure and rerun the complete relevant suite. Never report “fixed” merely because code was changed.
 8. **Human review is the exception, not the test harness.** Automate deterministic and repeatable checks. Reserve human attention for real-device behavior, product judgment, privacy/security decisions, and anything automation cannot observe.
