@@ -159,59 +159,71 @@ test('legacy collected_monster pending state resumes its exact actor', () => {
 });
 
 
+
 test('confirmed object status is monotonic after an evidence prefix reaches 75%', () => {
-  const fn = inlineScript[1].match(/function isConfirmedId\(id\)\{[^\n]*\}/);
-  assert.ok(fn, 'sticky confirmation resolver exists');
+  const script = inlineScript[1];
+  const start = script.indexOf('function isConfirmedId(id){');
+  const end = script.indexOf('\nfunction confirmedObjects', start);
+  assert.ok(start >= 0 && end > start, 'sticky confirmation resolver exists');
+  const fn = script.slice(start, end);
   const sandbox = { state: { evidence: [
     { physical_object_id: 'stable', confidence: 0.80, time: '2026-01-01T00:00:00Z' },
     { physical_object_id: 'stable', confidence: 0.522, time: '2026-01-02T00:00:00Z' },
     { physical_object_id: 'not-yet', confidence: 0.60, time: '2026-01-01T00:00:00Z' },
     { physical_object_id: 'not-yet', confidence: 0.70, time: '2026-01-02T00:00:00Z' }
   ] } };
-  vm.runInNewContext(fn[0] + '\nthis.isConfirmedId = isConfirmedId;', sandbox);
+  vm.runInNewContext(fn + '\nthis.isConfirmedId = isConfirmedId;', sandbox);
   assert.equal(sandbox.isConfirmedId('stable'), true, 'later 52.2% observation cannot revoke earlier confirmation');
   assert.equal(sandbox.isConfirmedId('not-yet'), false, 'an object that never reached the threshold stays unconfirmed');
 });
 
-test('P3 does not intervene on a first encounter and requires a prior loss for that exact context object', () => {
-  const start = inlineScript[1].indexOf('const P3_RULE_ENGINE=');
-  const end = inlineScript[1].indexOf(';\nconst PERSONAL_AI_SCHEMA', start);
+test('P3 does not intervene on a first encounter and requires losing the same collected Monster', () => {
+  const script = inlineScript[1];
+  const start = script.indexOf('const P3_RULE_ENGINE=');
+  const end = script.indexOf('\nconst PERSONAL_AI_SCHEMA', start);
   assert.ok(start >= 0 && end > start, 'P3 engine definition exists');
-  const definition = inlineScript[1].slice(start, end + 1);
+  const definition = script.slice(start, end).trim();
   const sandbox = {
     objectStatsById: () => ({ count: 3, avg: 0.9, best: 0.95 }),
     isConfirmedId: () => true,
     battleStatsFrom: (battles, id) => {
       const matches = battles.filter(b => b.opponentPhysicalObjectId === id);
-      return { missed: matches.filter(b => b.result === 'LOSE').length, collected: matches.filter(b => b.result === 'WIN').length, encounters: matches.length, ownMonsterLosses: battles.filter(x => x.actorPhysicalObjectId === id && x.actorType === 'collected_monster' && x.result === 'LOSE').length };
+      return {
+        missed: matches.filter(b => b.result === 'LOSE').length,
+        collected: matches.filter(b => b.result === 'WIN').length,
+        encounters: matches.length,
+        ownMonsterLosses: battles.filter(x => x.actorPhysicalObjectId === id && x.actorType === 'collected_monster' && x.result === 'LOSE').length
+      };
     }
   };
   vm.runInNewContext(definition + '\nthis.P3_RULE_ENGINE = P3_RULE_ENGINE;', sandbox);
   const context = { status: 'CONFIRMED', physical_object_id: 'object-A' };
   const candidate = { name: 'Object A', physical_object_id: 'object-A' };
-  const first = sandbox.P3_RULE_ENGINE.evaluate({ contexts: [context], battles: [], candidates: [candidate] });
-  assert.equal(first.applied, false, 'a first win/capture without losing the own Monster later must not trigger P3');
+  const first = sandbox.P3_RULE_ENGINE.evaluate({ contexts: [context], battles: [
+    { opponentPhysicalObjectId: 'object-A', actorPhysicalObjectId: 'object-B', actorType: 'collected_monster', result: 'WIN' }
+  ], candidates: [candidate] });
+  assert.equal(first.applied, false, 'winning and capturing the object the first time must not trigger P3');
   const afterLoss = sandbox.P3_RULE_ENGINE.evaluate({
     contexts: [context],
     battles: [{ actorPhysicalObjectId: 'object-A', actorType: 'collected_monster', opponentPhysicalObjectId: 'object-B', result: 'LOSE' }],
     candidates: [candidate]
   });
-  assert.equal(afterLoss.applied, true, 'the My AI object becomes eligible only after its own Monster is lost in battle');
+  assert.equal(afterLoss.applied, true, 'P3 becomes eligible only after this context Monster is lost from our team');
   assert.equal(afterLoss.selected.physical_object_id, 'object-A');
 });
 
 test('Quest prompt changes automatically when the third confirmed object is added', () => {
-  assert.match(inlineScript[1], /게임 재료를 다 모았네요\. 가위바위보 중에 하나를 고르세요\./);
-  assert.match(inlineScript[1], /state\.questObjects\.length>=3&&\$\('battleResult'\)\.textContent==='아직 3개 객체를 모으지 않았습니다\.'/);
+  assert.ok(inlineScript[1].includes('게임 재료를 다 모았네요. 가위바위보 중에 하나를 고르세요.'));
+  assert.ok(inlineScript[1].includes("state.questObjects.length>=3&&$('battleResult').textContent==='아직 3개 객체를 모으지 않았습니다.'"));
 });
 
 test('win and loss messages identify both monsters and the collection change', () => {
-  assert.match(inlineScript[1], /\$\{esc\(actorName\)\}가 \$\{esc\(opponent\.name\)\}을 이겨서 Monster Collection에 \$\{esc\(opponent\.name\)\}를 수집하였습니다/);
-  assert.match(inlineScript[1], /\$\{esc\(actorName\)\}가 \$\{esc\(opponent\.name\)\}에게 져서 Monster Collection에서 \$\{esc\(actorName\)\}이 사라졌습니다/);
+  assert.ok(inlineScript[1].includes('${esc(actorName)}가 ${esc(opponent.name)}을 이겨서 Monster Collection에 ${esc(opponent.name)}를 수집하였습니다.'));
+  assert.ok(inlineScript[1].includes('${esc(actorName)}가 ${esc(opponent.name)}에게 져서 Monster Collection에서 ${esc(actorName)}이 사라졌습니다.'));
 });
 
 test('battle records the physical identity of our Monster so a later loss can trigger P3 on re-scan', () => {
-  assert.match(inlineScript[1], /actorPhysicalObjectId:actor\?\.physical_object_id\|\|null/);
-  assert.match(inlineScript[1], /b\.actorPhysicalObjectId===id&&b\.actorType==='collected_monster'&&b\.result==='LOSE'/);
-  assert.match(inlineScript[1], /x\.battleStats\.ownMonsterLosses>0/);
+  assert.ok(inlineScript[1].includes('actorPhysicalObjectId:actor?.physical_object_id||null'));
+  assert.ok(inlineScript[1].includes("b.actorPhysicalObjectId===id&&b.actorType==='collected_monster'&&b.result==='LOSE'"));
+  assert.ok(inlineScript[1].includes('x.battleStats.ownMonsterLosses>0'));
 });
