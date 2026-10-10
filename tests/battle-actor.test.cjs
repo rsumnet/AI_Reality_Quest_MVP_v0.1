@@ -160,7 +160,7 @@ test('legacy collected_monster pending state resumes its exact actor', () => {
 
 
 test('confirmed object status is monotonic after an evidence prefix reaches 75%', () => {
-  const fn = inlineScript[1].match(/function isConfirmedId\\(id\\)\\{[^\\n]*\\}/);
+  const fn = inlineScript[1].match(/function isConfirmedId\(id\)\{[^\n]*\}/);
   assert.ok(fn, 'sticky confirmation resolver exists');
   const sandbox = { state: { evidence: [
     { physical_object_id: 'stable', confidence: 0.80, time: '2026-01-01T00:00:00Z' },
@@ -168,14 +168,14 @@ test('confirmed object status is monotonic after an evidence prefix reaches 75%'
     { physical_object_id: 'not-yet', confidence: 0.60, time: '2026-01-01T00:00:00Z' },
     { physical_object_id: 'not-yet', confidence: 0.70, time: '2026-01-02T00:00:00Z' }
   ] } };
-  vm.runInNewContext(fn[0] + '\\nthis.isConfirmedId = isConfirmedId;', sandbox);
+  vm.runInNewContext(fn[0] + '\nthis.isConfirmedId = isConfirmedId;', sandbox);
   assert.equal(sandbox.isConfirmedId('stable'), true, 'later 52.2% observation cannot revoke earlier confirmation');
   assert.equal(sandbox.isConfirmedId('not-yet'), false, 'an object that never reached the threshold stays unconfirmed');
 });
 
 test('P3 does not intervene on a first encounter and requires a prior loss for that exact context object', () => {
   const start = inlineScript[1].indexOf('const P3_RULE_ENGINE=');
-  const end = inlineScript[1].indexOf(';\\nconst PERSONAL_AI_SCHEMA', start);
+  const end = inlineScript[1].indexOf(';\nconst PERSONAL_AI_SCHEMA', start);
   assert.ok(start >= 0 && end > start, 'P3 engine definition exists');
   const definition = inlineScript[1].slice(start, end + 1);
   const sandbox = {
@@ -186,7 +186,7 @@ test('P3 does not intervene on a first encounter and requires a prior loss for t
       return { missed: matches.filter(b => b.result === 'LOSE').length, collected: matches.filter(b => b.result === 'WIN').length, encounters: matches.length };
     }
   };
-  vm.runInNewContext(definition + '\\nthis.P3_RULE_ENGINE = P3_RULE_ENGINE;', sandbox);
+  vm.runInNewContext(definition + '\nthis.P3_RULE_ENGINE = P3_RULE_ENGINE;', sandbox);
   const context = { status: 'CONFIRMED', physical_object_id: 'object-A' };
   const candidate = { name: 'Object A', physical_object_id: 'object-A' };
   const first = sandbox.P3_RULE_ENGINE.evaluate({ contexts: [context], battles: [], candidates: [candidate] });
@@ -201,11 +201,11 @@ test('P3 does not intervene on a first encounter and requires a prior loss for t
 });
 
 test('Quest prompt changes automatically when the third confirmed object is added', () => {
-  assert.match(inlineScript[1], /게임 재료를 다 모았네요\\. 가위바위보 중에 하나를 고르세요\\./);
-  assert.match(inlineScript[1], /state\.questObjects\.length>=3&&\\$\\('battleResult'\\)\.textContent==='아직 3개 객체를 모으지 않았습니다\\.'/);
+  assert.match(inlineScript[1], /게임 재료를 다 모았네요\. 가위바위보 중에 하나를 고르세요\./);
+  assert.match(inlineScript[1], /state\.questObjects\.length>=3&&\$\('battleResult'\)\.textContent==='아직 3개 객체를 모으지 않았습니다\.'/);
 });
 
 test('win and loss messages identify both monsters and the collection change', () => {
-  assert.match(inlineScript[1], /\$\\{esc\\(actorName\\)\\}가 \$\\{esc\\(opponent\.name\\)\\}을 이겨서 Monster Collection에 \$\\{esc\\(opponent\.name\\)\\}를 수집하였습니다/);
-  assert.match(inlineScript[1], /\$\\{esc\\(actorName\\)\\}가 \$\\{esc\\(opponent\.name\\)\\}에게 져서 Monster Collection에서 \$\\{esc\\(actorName\\)\\}이 사라졌습니다/);
+  assert.match(inlineScript[1], /\$\{esc\(actorName\)\}가 \$\{esc\(opponent\.name\)\}을 이겨서 Monster Collection에 \$\{esc\(opponent\.name\)\}를 수집하였습니다/);
+  assert.match(inlineScript[1], /\$\{esc\(actorName\)\}가 \$\{esc\(opponent\.name\)\}에게 져서 Monster Collection에서 \$\{esc\(actorName\)\}이 사라졌습니다/);
 });
