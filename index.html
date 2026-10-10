@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#111827">
-<title>AI Reality Quest — MVP v0.2.8</title>
+<title>AI Reality Quest — MVP v0.4.7</title>
 <style>
 :root{--bg:#0b1020;--card:#151c30;--card2:#1b2540;--text:#f4f7fb;--muted:#9eabc4;--accent:#7dd3fc;--good:#86efac;--warn:#fde68a;--bad:#fca5a5;--line:#2b3857}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#0b1020,#10172a);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -14,12 +14,12 @@
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.btn{border:0;border-radius:11px;padding:10px 13px;background:var(--accent);color:#062033;font-weight:750;cursor:pointer}.btn.secondary{background:#26334f;color:var(--text)}.btn:disabled{opacity:.4;cursor:not-allowed}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.stat{background:var(--card2);padding:10px;border-radius:12px}.stat b{display:block;font-size:20px}.stat span{font-size:11px;color:var(--muted)}.result{margin-top:10px;padding:12px;border-radius:12px;background:var(--card2);min-height:70px}.confidence{font-weight:800}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
 .collection{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:360px;overflow:auto}.obj{padding:10px;border:1px solid var(--line);border-radius:12px;background:#121a2d}.obj .name{font-weight:800}.obj small{color:var(--muted)}.meter{height:8px;background:#0b1020;border-radius:99px;overflow:hidden;margin-top:8px}.meter i{display:block;height:100%;background:var(--accent);width:0%}.mission{padding:12px;border-radius:12px;background:var(--card2);line-height:1.5}.mission strong{font-size:18px}.game{display:none}.choices{display:flex;gap:8px}.choice{flex:1;padding:13px;border-radius:12px;border:1px solid var(--line);background:#111a2e;color:var(--text);font-size:22px;cursor:pointer}.monster{font-size:52px;text-align:center;padding:10px;min-height:78px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#f4f7fb;color:#08111e;padding:10px 15px;border-radius:999px;font-weight:750;display:none;z-index:5}.note{font-size:12px;color:var(--muted);line-height:1.55}.status{margin-top:8px;padding:10px;border-radius:10px;background:#10182b;border:1px solid var(--line);font-size:12px}.edit{display:flex;gap:6px;align-items:center;margin-top:7px}.edit input{flex:1;min-width:0;border:1px solid var(--line);background:#0c1425;color:var(--text);border-radius:8px;padding:7px}.confirmed{color:var(--good);font-weight:800}.possible{color:var(--warn);font-weight:800}.uncertain{color:var(--muted);font-weight:800}.footer{margin-top:14px;color:var(--muted);font-size:11px}.sectionTitle{display:flex;justify-content:space-between;align-items:center;gap:8px}.pill{font-size:10px;padding:4px 7px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
-.objectView{display:none;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#10182b}.objectView.show{display:block}.objectView h3{margin:0 0 8px;font-size:15px}.history{display:grid;gap:7px;margin-top:10px}.historyItem{padding:9px;border:1px solid var(--line);border-radius:10px;background:#121a2d;cursor:pointer}.historyItem:hover{background:#18233d}.detail{margin-top:10px;padding:10px;border-radius:10px;background:#0c1425;border:1px solid var(--line)}.kv{display:grid;grid-template-columns:100px 1fr;gap:5px;font-size:12px}.kv b{color:var(--muted)}
+.objectView{display:none;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#10182b}.objectView.show{display:block}.objectView h3{margin:0 0 8px;font-size:15px}.history{display:grid;gap:7px;margin-top:10px}.historyItem{padding:9px;border:1px solid var(--line);border-radius:10px;background:#121a2d;cursor:pointer}.historyItem:hover{background:#18233d}.detail{margin-top:10px;padding:10px;border-radius:10px;background:#0c1425;border:1px solid var(--line)}.kv{display:grid;grid-template-columns:100px 1fr;gap:5px;font-size:12px}.kv b{color:var(--muted)}.logBox{overflow:hidden}.logBox .logItem:nth-of-type(n+5){display:none}.logBox.expanded .logItem{display:block}.logMore{margin-top:8px}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div><h1>🗺️ AI Reality Quest</h1><div class="sub">AI에게 세상을 가르치고, AI와 함께 세상을 탐험한다.</div></div><div class="badge">MVP v0.2.8 · Browser / On-device inference</div></div>
+  <div class="top"><div><h1>🗺️ AI Reality Quest</h1><div class="sub">AI에게 세상을 가르치고, AI와 함께 세상을 탐험한다.</div></div><div class="badge">MVP v0.4.7 · Browser / On-device inference</div></div>
   <div class="grid">
     <section class="card">
       <h2>① Reality Scanner</h2>
@@ -35,10 +35,9 @@
     <div class="sectionTitle" style="margin-top:14px"><h2 style="margin:0">Monster Collection</h2><span class="pill">Cumulative · Image</span></div>
     <div class="collection" id="monsterCollection"></div>
       <div id="game" class="game">
-        <h2>③ Monster Battle — 가위바위보</h2><div class="note">Quest에서 서로 다른 게임용 객체 3개를 모으면 Battle을 시작할 수 있습니다. 수집한 Monster는 최대 3마리까지 먼저 출전하고, 모두 패배하면 고객이 직접 승부합니다.</div>
-        <div class="row" style="margin:10px 0"><button class="btn secondary" id="newBattle">새 Battle</button></div>
-        <div class="choices"><button class="choice" data-choice="rock">✊</button><button class="choice" data-choice="paper">✋</button><button class="choice" data-choice="scissors">✌️</button></div>
-        <div class="result" id="battleResult">아직 3개 객체를 모으지 않았습니다.</div><div id="battleMonster" class="monster"></div><div id="monster" class="status">출전 Monster가 없습니다.</div><div class="status" id="battleHistory">아직 Battle 결과가 없습니다.</div>
+        <h2>③ Quest Game — 교체 가능한 게임 모듈</h2><div class="note">현실 관측, Evidence, My AI, Quest, Monster Collection은 공통 핵심으로 유지합니다. 아래 게임만 모듈로 교체할 수 있습니다. 수집한 Monster는 최대 3마리까지 먼저 출전하고, 모두 패배하면 고객이 직접 승부합니다.</div>
+        <div class="row" style="margin:10px 0;align-items:center"><label for="gameSelector" class="note">게임 모듈</label><select id="gameSelector" class="btn secondary" aria-label="게임 모듈 선택"></select><button class="btn secondary" id="newBattle">새 Battle</button></div><div id="gameDescription" class="note"></div><div id="gameControls" class="choices" aria-live="polite"></div>
+        <div class="result" id="battleResult">아직 3개 객체를 모으지 않았습니다.</div><div id="battleMonster" class="monster"></div><div id="monster" class="status">출전 Monster가 없습니다.</div><div class="status logBox" id="battleHistory">아직 Battle 결과가 없습니다.</div><button class="btn secondary logMore" data-log-target="battleHistory">더보기</button><div class="note" style="margin-top:8px">P3는 Personal Context가 확인된 경우에만 <b>상대팀 몬스터 선택</b>에 개입합니다. 우리팀 출전 Monster 선택에는 관여하지 않습니다.</div>
       </div>
     </section>
   </div>
@@ -52,11 +51,11 @@
       <div id="evidenceDetail" class="detail" style="display:none"></div>
     </div>
     <div class="sectionTitle" style="margin-top:14px"><h2 style="margin:0">Raw Evidence Log</h2><span class="pill">All observations</span></div>
-    <div class="evidence" id="evidence"></div>
+    <div class="evidence logBox" id="evidence"></div><button class="btn secondary logMore" data-log-target="evidence">더보기</button>
   </section>
   <section class="card" style="margin-top:14px">
     <div class="sectionTitle"><h2>⑤ Personal Context → My AI</h2><span class="pill">P2 Minimal MVP</span></div>
-    <div id="contextCandidates" class="note">Evidence가 2회 이상 누적된 확정 객체에서 Personal Context 후보를 제안합니다.</div>
+    <div id="contextCandidates" class="note logBox">Evidence가 2회 이상 누적된 확정 객체에서 Personal Context 후보를 제안합니다.</div><button class="btn secondary logMore" data-log-target="contextCandidates">더보기</button>
     <div id="personalContexts" class="collection" style="margin-top:10px"></div>
     <div id="myAiResult" class="result" style="margin-top:10px">아직 확인된 Personal Context가 없습니다.</div>
     <div class="note" style="margin-top:8px">
@@ -64,15 +63,22 @@
       AI는 Context 후보를 제안하고, 사용자가 확인한 것만 Personal Context가 됩니다.
     </div>
   </section>
+  <section class="card" style="margin-top:14px"><div class="sectionTitle"><h2>⑥ Context-Driven AI Behavior</h2><span class="pill">P3 · Rule Engine</span></div><div class="note">Personal Context가 My AI의 다음 판단을 실제로 바꾸는지 검증합니다. 현재는 교체 가능한 Simple Rule Engine을 사용합니다.</div><div class="result" style="margin-top:10px"><b>현재 P3 엔진</b><br><span class="good">simple-0.1</span><br><span class="note">계약: Personal Context + Battle History + 후보 → 다음 판단 + 판단 근거</span></div><div class="note" style="margin-top:8px">Context가 없는 경우 기존 Battle과 동일하게 동작하고, Context가 있는 경우 <b>상대팀</b>에서 과거에 놓친 개인 객체를 우선 선택합니다. 우리팀 출전 순서/선택은 P3 대상이 아닙니다. 이후 Simple Rule Engine만 Huge Rule Engine으로 교체할 수 있습니다.</div></section>
   <div class="footer">교육용 MVP입니다. 카메라/위치 권한이 필요하며, 현재 구현은 브라우저에서 모델 추론을 수행하고 Evidence를 localStorage에 저장합니다. Physical Object Identity는 현재 카메라 이미지의 간단한 시각적 fingerprint를 이용한 MVP 수준의 중복 판정입니다. 실제 배포 전에는 HTTPS, 개인정보 보호, 미성년자 동의/보호 절차, 모델/라이브러리 라이선스를 별도 검토해야 합니다.</div>
 </div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script src="games/game-registry.js"></script>
+<script src="games/rps.js"></script>
+<script src="games/odd-even.js"></script>
+<script src="games/dice.js"></script>
 <script>
-const ARQ_SCHEMA_VERSION='0.3.0';
+const ARQ_SCHEMA_VERSION='0.4.7';
+const P3_RULE_ENGINE_VERSION='simple-0.1';
+const P3_RULE_ENGINE={version:P3_RULE_ENGINE_VERSION,evaluate({contexts,battles,candidates}){const confirmed=contexts.filter(c=>c.status==='CONFIRMED');if(!confirmed.length||!candidates.length)return {applied:false,selected:null,reason:'Personal Context 없음'};const eligible=confirmed.map(context=>{const id=context.physical_object_id;const stats=objectStatsById(id);const battleStats=battleStatsFrom(battles,id);return {context,evidenceCount:stats.count,confirmed:isConfirmedId(id),battleStats};}).filter(x=>x.evidenceCount>=2&&x.confirmed&&x.battleStats.ownMonsterLosses>0).map(x=>x.context);if(!eligible.length)return {applied:false,selected:null,reason:'My AI 객체가 우리팀에서 패배해 사라진 기록 없음'};const scored=candidates.map(candidate=>{const context=eligible.find(c=>c.physical_object_id===candidate.physical_object_id);if(!context)return null;const stats=battleStatsFrom(battles,candidate.physical_object_id);const score=1+(stats.ownMonsterLosses*3)+(stats.encounters*0.1);return {...candidate,score,context,stats,reason:'우리팀에서 패배해 잃은 My AI 객체를 우선 재선택'};}).filter(Boolean).sort((a,b)=>b.score-a.score);if(!scored.length)return {applied:false,selected:null,reason:confirmed.some(c=>battleStatsFrom(battles,c.physical_object_id).missed===0)?'과거 패배 기록이 있는 Personal Context 객체 없음':'현재 상대 후보 중 Personal Context 객체 없음'};const selected=scored[0];return {applied:true,selected,reason:selected.reason,engine:this.version};}};
 const PERSONAL_AI_SCHEMA={evidence:['id','object','confidence','time','location','zone','source','model','processing','human_feedback','context_ref','physical_object_id','visual_fingerprint'],context:['id','purpose','mission','situation','references','history'],rules:['id','when','condition','then','priority','source']};
-const state={model:null,stream:null,last:null,personalContexts:JSON.parse(localStorage.getItem('arq_personal_contexts')||'[]'),zone:localStorage.getItem('arq_zone')||null,gps:JSON.parse(localStorage.getItem('arq_gps')||'null'),evidence:JSON.parse(localStorage.getItem('arq_evidence')||'[]'),monsters:JSON.parse(localStorage.getItem('arq_monsters')||'[]'),battles:JSON.parse(localStorage.getItem('arq_battles')||'[]'),attempts:JSON.parse(localStorage.getItem('arq_attempts')||'[]'),battlePending:JSON.parse(localStorage.getItem('arq_battle_pending')||'null'),battleUnlocked:localStorage.getItem('arq_battle_unlocked')==='1',questObjects:JSON.parse(localStorage.getItem('arq_quest_objects')||'[]').map(q=>typeof q==='string'?{name:q,physical_object_id:null}:q),selectedObjectId:null,selectedEvidenceId:null};state.battleUnlocked=state.battleUnlocked||state.questObjects.length>=3;
+const state={model:null,stream:null,last:null,personalContexts:JSON.parse(localStorage.getItem('arq_personal_contexts')||'[]'),zone:localStorage.getItem('arq_zone')||null,gps:JSON.parse(localStorage.getItem('arq_gps')||'null'),evidence:JSON.parse(localStorage.getItem('arq_evidence')||'[]'),monsters:JSON.parse(localStorage.getItem('arq_monsters')||'[]'),battles:JSON.parse(localStorage.getItem('arq_battles')||'[]'),attempts:JSON.parse(localStorage.getItem('arq_attempts')||'[]'),battlePending:JSON.parse(localStorage.getItem('arq_battle_pending')||'null'),battleUnlocked:localStorage.getItem('arq_battle_unlocked')==='1',selectedGameId:localStorage.getItem('arq_selected_game')||'rps',questObjects:JSON.parse(localStorage.getItem('arq_quest_objects')||'[]').map(q=>typeof q==='string'?{name:q,physical_object_id:null}:q),selectedObjectId:null,selectedEvidenceId:null};state.battleUnlocked=state.battleUnlocked||state.questObjects.length>=3;
 
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem('arq_personal_contexts',JSON.stringify(state.personalContexts));localStorage.setItem('arq_zone',state.zone||'');localStorage.setItem('arq_gps',JSON.stringify(state.gps));localStorage.setItem('arq_evidence',JSON.stringify(state.evidence));localStorage.setItem('arq_monsters',JSON.stringify(state.monsters));localStorage.setItem('arq_battles',JSON.stringify(state.battles));localStorage.setItem('arq_attempts',JSON.stringify(state.attempts));localStorage.setItem('arq_battle_pending',JSON.stringify(state.battlePending));localStorage.setItem('arq_battle_unlocked',state.battleUnlocked?'1':'0');localStorage.setItem('arq_quest_objects',JSON.stringify(state.questObjects));}
@@ -83,11 +89,11 @@ function nextObjectKey(label){const base=canonicalBase(label);const used=new Set
 function objectRecords(){const map=new Map();for(const e of state.evidence){if(!e.physical_object_id)continue;if(!map.has(e.physical_object_id))map.set(e.physical_object_id,{id:e.physical_object_id,evidence:[]});map.get(e.physical_object_id).evidence.push(e)}return [...map.values()]}
 function objectStatsById(id){const es=state.evidence.filter(e=>e.physical_object_id===id);const scores=es.map(e=>Number(e.confidence||0));return {count:es.length,avg:scores.length?scores.reduce((a,v)=>a+v,0)/scores.length:0,best:scores.length?Math.max(...scores):0}}
 function displayNameFor(id){const e=state.evidence.find(x=>x.physical_object_id===id);return e?.user_label||e?.object_key||e?.ai_label||'OBJECT'}
-function isConfirmedId(id){return objectStatsById(id).avg>=0.75}
+function isConfirmedId(id){const es=state.evidence.filter(e=>e.physical_object_id===id).sort((a,b)=>new Date(a.time)-new Date(b.time));let sum=0;for(let i=0;i<es.length;i++){sum+=Number(es[i].confidence||0);if(sum/(i+1)>=0.75)return true}return false}
 function confirmedObjects(){return objectRecords().filter(r=>isConfirmedId(r.id))}
 function confidenceLabel(score){if(score>=0.75)return ['확정 객체','confirmed'];if(score>=0.50)return ['가능성 있음 · 아직 불확실','possible'];return ['낮은 가능성 · 검토 필요','uncertain']}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function clearBattleResult(){if($('battleResult'))$('battleResult').textContent=state.questObjects.length>=3?'선택하세요.':'아직 3개 객체를 모으지 않았습니다.'}
+function clearBattleResult(){if($('battleResult'))$('battleResult').textContent=state.questObjects.length>=3?'게임 재료를 다 모았네요. 선택한 게임을 시작하세요.':'아직 3개 객체를 모으지 않았습니다.'}
 function monsterVisual(m){return m.image||m.symbol||'🧌'}
 function evidenceStatus(e){const s=e?.human_feedback?.status;if(s==='merged_by_human_label')return ['MERGED','confirmed'];if(s==='renamed')return ['CORRECTED','confirmed'];return ['UNREVIEWED','possible']}
 function openObjectHistory(id){state.selectedObjectId=id;state.selectedEvidenceId=null;const es=state.evidence.filter(e=>e.physical_object_id===id).sort((a,b)=>new Date(b.time)-new Date(a.time));if(!es.length)return;const st=objectStatsById(id),name=displayNameFor(id);$('objectView').classList.add('show');$('objectViewTitle').textContent=`${name} · Object History`;$('objectSummary').innerHTML=`Physical Object: <b>${esc(id)}</b> · AI Label: <b>${esc(es[0].ai_label||'unknown')}</b> · Evidence <b>${st.count}</b> · 평균 관측 <b>${(st.avg*100).toFixed(1)}%</b>`;$('objectHistory').innerHTML=es.map(e=>{const [status,cls]=evidenceStatus(e);return `<div class="historyItem" data-evidence-id="${esc(e.id)}"><b>Evidence #${esc(e.id.slice(-6))}</b> · AI ${esc(e.ai_label||'unknown')} · ${(Number(e.confidence||0)*100).toFixed(1)}% · <span class="${cls}">${status}</span><br><small>${new Date(e.time).toLocaleString()} · ${esc(e.zone||'Zone 없음')}</small></div>`}).join('');document.querySelectorAll('.historyItem').forEach(x=>x.onclick=()=>openEvidenceDetail(x.dataset.evidenceId));$('evidenceDetail').style.display='none'}
@@ -103,14 +109,18 @@ function p2Candidates(){
   }).filter(Boolean);
 }
 function p2BattleStats(id){
-  let collected=0,missed=0,encounters=0;
-  for(const b of state.battles){
+  return battleStatsFrom(state.battles,id);
+}
+function battleStatsFrom(battles,id){
+  let collected=0,missed=0,opponentMisses=0,encounters=0,ownMonsterLosses=0;
+  for(const b of battles){
+    if(b.actorPhysicalObjectId===id&&b.actorType==='collected_monster'&&b.result==='LOSE'){ownMonsterLosses++;missed++;}
     if(b.opponentPhysicalObjectId!==id)continue;
     encounters++;
     if(b.result==='WIN')collected++;
-    if(b.result==='LOSE')missed++;
+    if(b.result==='LOSE'){opponentMisses++;missed++;}
   }
-  return {collected,missed,encounters};
+  return {collected,missed,opponentMisses,encounters,ownMonsterLosses};
 }
 function p2ContextText(c){
   const s=p2BattleStats(c.physical_object_id);
@@ -145,7 +155,7 @@ function showMyAI(id){
 function renderP2(){
   const candidates=p2Candidates();
   $('contextCandidates').innerHTML=candidates.length
-    ? `<b>AI Context 후보</b><br>${candidates.map(c=>`<div class="obj" style="margin-top:8px"><div class="name">${esc(c.name)}</div><small>Evidence ${c.evidence_count}회 · 평균 관측 ${(c.avg*100).toFixed(1)}%</small><div style="margin-top:6px">“${esc(c.name)}은 반복해서 관찰된 나의 객체입니다.”</div><div class="row" style="margin-top:8px"><button class="btn" data-context-id="${esc(c.physical_object_id)}">Personal Context로 확인</button></div></div>`).join('')}`
+    ? `<b>AI Context 후보</b><br>${candidates.map(c=>`<div class="obj logItem" style="margin-top:8px"><div class="name">${esc(c.name)}</div><small>Evidence ${c.evidence_count}회 · 평균 관측 ${(c.avg*100).toFixed(1)}%</small><div style="margin-top:6px">“${esc(c.name)}은 반복해서 관찰된 나의 객체입니다.”</div><div class="row" style="margin-top:8px"><button class="btn" data-context-id="${esc(c.physical_object_id)}">Personal Context로 확인</button></div></div>`).join('')}`
     : '현재 확인할 Personal Context 후보가 없습니다. 같은 확정 객체의 Evidence를 2회 이상 쌓아보세요.';
   $('personalContexts').innerHTML=state.personalContexts.length
     ? state.personalContexts.slice().reverse().map(c=>{const n=displayNameFor(c.physical_object_id);return `<div class="obj"><div class="name">✓ ${esc(n)}</div><small>CONFIRMED · ${new Date(c.committedAt).toLocaleString()}</small><div style="margin-top:6px">${esc(c.meaning)}</div><div class="row" style="margin-top:8px"><button class="btn secondary" data-my-ai-id="${esc(c.physical_object_id)}">My AI 사용</button></div></div>`}).join('')
@@ -158,18 +168,18 @@ function render(){
  const confirmed=confirmedObjects();
  $('game').style.display=state.battleUnlocked?'block':'none';
  $('count').textContent=confirmed.length;$('evCount').textContent=state.evidence.length;$('zone').textContent=state.zone||'—';
- $('progressText').textContent=Math.min(state.questObjects.length,3)+' / 3';$('progress').style.width=Math.min(100,state.questObjects.length/3*100)+'%';
+ $('progressText').textContent=Math.min(state.questObjects.length,3)+' / 3';$('progress').style.width=Math.min(100,state.questObjects.length/3*100)+'%';if(state.questObjects.length>=3&&$('battleResult').textContent==='아직 3개 객체를 모으지 않았습니다.')$('battleResult').textContent='게임 재료를 다 모았네요. 가위바위보 중에 하나를 고르세요.';
  $('questObjects').textContent=state.questObjects.length?`이번 Quest 객체: ${state.questObjects.map(q=>q.name).join(', ')}`:'이번 Quest: 새 객체 3개를 모으세요.';
  $('collection').innerHTML=confirmed.length?confirmed.map(r=>{const st=objectStatsById(r.id),n=displayNameFor(r.id);return `<div class="obj"><div class="name">🔎 ${esc(n)}</div><small>${st.count} Evidence · 누적 관측 ${(st.avg*100).toFixed(1)}% · 최고 ${(st.best*100).toFixed(1)}%</small><div class="confirmed" style="margin-top:4px">확정 객체 · ${esc(r.id.slice(-6))}</div><div class="row" style="margin-top:7px"><button class="btn secondary historyBtn" data-id="${esc(r.id)}">Evidence History</button></div><div class="edit"><input value="${esc(n)}" aria-label="객체 이름 수정"><button class="btn secondary rename" data-id="${esc(r.id)}">수정</button></div></div>`}).join(''):'<div class="note">아직 확정된 객체가 없습니다.</div>';
- $('evidence').innerHTML=state.evidence.length?state.evidence.slice().reverse().map(e=>{const [label,cls]=confidenceLabel(Number(e.confidence||0));const n=e.user_label||e.object_key||e.ai_label||'OBJECT';return `<div class="ev"><b>${esc(n)}</b> · AI ${esc(e.ai_label||'unknown')} · ${(Number(e.confidence||0)*100).toFixed(1)}% · <span class="${cls}">${label}</span> · ${esc(e.zone||'Zone 없음')}<br>${new Date(e.time).toLocaleString()} · 개체 ${esc((e.physical_object_id||e.id).slice(-6))}<div class="edit"><input value="${esc(n)}" aria-label="객체 이름 수정"><button class="btn secondary evrename" data-id="${esc(e.id)}">수정</button></div></div>`}).join(''):'<div class="note">아직 Evidence가 없습니다.</div>';
+ $('evidence').innerHTML=state.evidence.length?state.evidence.slice().reverse().map(e=>{const [label,cls]=confidenceLabel(Number(e.confidence||0));const n=e.user_label||e.object_key||e.ai_label||'OBJECT';return `<div class="ev logItem"><b>${esc(n)}</b> · AI ${esc(e.ai_label||'unknown')} · ${(Number(e.confidence||0)*100).toFixed(1)}% · <span class="${cls}">${label}</span> · ${esc(e.zone||'Zone 없음')}<br>${new Date(e.time).toLocaleString()} · 개체 ${esc((e.physical_object_id||e.id).slice(-6))}<div class="edit"><input value="${esc(n)}" aria-label="객체 이름 수정"><button class="btn secondary evrename" data-id="${esc(e.id)}">수정</button></div></div>`}).join(''):'<div class="note">아직 Evidence가 없습니다.</div>';
  $('monsterCollection').innerHTML=state.monsters.length?state.monsters.slice().reverse().map((m,i)=>`<div class="obj"><div class="monster" style="font-size:48px">${monsterVisual(m)}</div><div class="name">${esc(m.name||m.object)} MONSTER</div><small>획득 ${new Date(m.time).toLocaleString()} · ${state.monsters.length-i}번째 Monster</small></div>`).join(''):'<div class="note">아직 수집한 Monster가 없습니다.</div>';
- $('battleHistory').innerHTML=state.battles.length?state.battles.slice().reverse().map(b=>`${new Date(b.time).toLocaleString()} · ${esc(b.actor||'고객')} · ${esc(b.result)} · ${b.acquired?esc(b.acquired):''}`).join('<br>'):'아직 Battle 결과가 없습니다.';
+$('battleHistory').innerHTML=state.battles.length?state.battles.slice().reverse().map(b=>`<div class="logItem">${new Date(b.time).toLocaleString()} · 우리팀 ${esc(b.actor||'고객')} vs 상대팀 ${esc(b.opponent||'MONSTER')} · ${esc(b.result)} · ${b.acquired?esc(b.acquired)+' · ':''}${b.missed?'놓침: '+esc(b.missed)+' · ':''}<span class="${b.p3?.applied?'good':'note'}">${b.p3?.applied?'P3 개입(상대팀)':'P3 미개입'}</span>${b.p3?.reason?' · '+esc(b.p3.reason):''}</div>`).join(''):'아직 Battle 결과가 없습니다.';
  $('battleMonster').innerHTML=state.monsters.length?state.monsters.slice(-3).reverse().map(m=>`<span title="${esc(m.name||m.object)}">${monsterVisual(m)}</span>`).join(' '):'🧌';
  $('monster').innerHTML=state.monsters.length?`현재 출전 후보 Monster 최대 3마리: ${state.monsters.slice(-3).map(m=>esc(m.name||m.object)).join(', ')}`:'출전 Monster가 없습니다.';
- document.querySelectorAll('.rename').forEach(btn=>btn.onclick=()=>renameObject(btn.dataset.id,btn.parentElement.querySelector('input').value));document.querySelectorAll('.historyBtn').forEach(btn=>btn.onclick=()=>openObjectHistory(btn.dataset.id));
+ document.querySelectorAll('.rename').forEach(btn=>btn.onclick=()=>renameObject(btn.dataset.id,btn.parentElement.querySelector('input').value));function refreshLogButtons(){document.querySelectorAll('.logMore').forEach(btn=>{const box=$(btn.dataset.logTarget),items=box.querySelectorAll('.logItem');btn.style.display=items.length>4?'inline-block':'none';if(items.length<=4)box.classList.remove('expanded');btn.textContent=box.classList.contains('expanded')?'감추기':'더보기';});} document.querySelectorAll('.logMore').forEach(btn=>btn.onclick=()=>{const box=$(btn.dataset.logTarget);box.classList.toggle('expanded');btn.textContent=box.classList.contains('expanded')?'감추기':'더보기';});document.querySelectorAll('.historyBtn').forEach(btn=>btn.onclick=()=>openObjectHistory(btn.dataset.id));
  document.querySelectorAll('.evrename').forEach(btn=>btn.onclick=()=>renameEvidence(btn.dataset.id,btn.parentElement.querySelector('input').value));
  $('gpsStatus').innerHTML=state.gps&&state.zone?`GPS: ${state.gps.lat.toFixed(6)}, ${state.gps.lon.toFixed(6)} · Zone: ${state.zone}`:'GPS/Zone: 아직 기록되지 않았습니다.';
- renderP2();
+ renderP2();refreshLogButtons();
 }
 function addConfirmedToQuest(physicalObjectId){if(!physicalObjectId||!isConfirmedId(physicalObjectId)||state.questObjects.length>=3)return false;if(state.monsters.some(m=>m.physical_object_id===physicalObjectId))return false;if(state.questObjects.some(q=>q.physical_object_id===physicalObjectId))return false;const n=displayNameFor(physicalObjectId);state.questObjects.push({name:n,physical_object_id:physicalObjectId});if(state.questObjects.length===3)state.battleUnlocked=true;return true}
 function validUserLabel(v){const x=v.trim().replace(/\s+/g,' ');return /[A-Za-z0-9]/.test(x)&&/^[A-Za-z0-9가-힣]+(?:[ _-][A-Za-z0-9가-힣]+)*$/i.test(x)}
@@ -239,9 +249,9 @@ async function scan(){
   const physical=findPhysicalObject(fingerprint,state.gps,now,p.class,p.bbox);const physicalId=physical?.id||crypto.randomUUID();
   const previous=state.evidence.filter(e=>e.physical_object_id===physicalId);
   const newAvg=(previous.reduce((a,e)=>a+Number(e.confidence||0),0)+p.score)/(previous.length+1);
-  const [label,cls]=confidenceLabel(newAvg);const objectKey=previous[0]?.object_key||nextObjectKey(p.class);const userLabel=previous[0]?.user_label||null;
+  const objectKey=previous[0]?.object_key||nextObjectKey(p.class);const userLabel=previous[0]?.user_label||null;
   const ev={schemaVersion:ARQ_SCHEMA_VERSION,id:crypto.randomUUID(),object_key:objectKey,ai_label:p.class.toUpperCase(),user_label:userLabel,object:userLabel||objectKey,confidence:p.score,time:new Date(now).toISOString(),location:{gps:state.gps},zone:state.zone,source:'phone_camera',model:'coco-ssd',processing:'on_device_browser_model',human_feedback:{status:userLabel?'renamed':'unreviewed',renamed:!!userLabel},context_ref:null,condition:{angle:'unknown',distance:'unknown',lighting:'unknown'},physical_object_id:physicalId,visual_fingerprint:fingerprint,bbox:p.bbox};
-  state.evidence.push(ev);const becameConfirmed=newAvg>=.75;const addedQuest=becameConfirmed?addConfirmedToQuest(physicalId):false;save();
+  state.evidence.push(ev);const becameConfirmed=isConfirmedId(physicalId);const [label,cls]=becameConfirmed?['확정 객체','confirmed']:confidenceLabel(newAvg);const addedQuest=becameConfirmed?addConfirmedToQuest(physicalId):false;save();
   const name=userLabel||objectKey;const best=Math.max(p.score,...previous.map(e=>Number(e.confidence||0)));
   const identityText=physical?`기존 물리 객체 재관찰 · 시각유사도 ${(physical.visual*100).toFixed(1)}% · 거리 ${physical.nearest.toFixed(1)}m`:'새 물리 객체로 기록';
   $('result').innerHTML=`<b>${esc(p.class)}</b> · <span class="confidence">이번 관측 ${(p.score*100).toFixed(1)}%</span><br><span class="${cls}">${label}</span> · <span class="note">이 개체 누적 ${(newAvg*100).toFixed(1)}% · 최고 ${(best*100).toFixed(1)}%</span><br><span class="note">${esc(name)} · ${identityText} · Evidence 저장${addedQuest?' · Quest +1':''}</span>`;
@@ -249,54 +259,80 @@ async function scan(){
  }catch(e){console.error(e);$('result').innerHTML='<span class="bad">실행 중 문제가 발생했습니다. 관리자에게 문의하세요.</span>'}
 }
 function gps(){clearBattleResult();if(!navigator.geolocation){$('gpsStatus').innerHTML='<span class="bad">이 브라우저는 위치 기능을 지원하지 않습니다.</span><br>지원되는 브라우저에서 다시 시도해주세요.';return}$('gpsStatus').textContent='GPS/Zone: 위치를 확인하는 중…';navigator.geolocation.getCurrentPosition(pos=>{state.gps={lat:pos.coords.latitude,lon:pos.coords.longitude,accuracy:pos.coords.accuracy};state.zone=zoneFrom(pos.coords.latitude,pos.coords.longitude);save();render();toast(`현재 Zone: ${state.zone}`)},e=>{let msg=e.code===1?'GPS/Zone 위치 권한이 차단되어 있습니다.':e.code===2?'휴대폰 위치(GPS)가 꺼져 있습니다.':e.code===3?'위치 확인 시간이 초과되었습니다.':'위치 정보를 확인할 수 없습니다.';$('gpsStatus').innerHTML=`<span class="warn">${msg}</span><br><button class="btn secondary" id="gpsRetry">다시 허용/시도</button>`;$('gpsRetry').onclick=()=>gps()})}
-const beats={rock:'scissors',paper:'rock',scissors:'paper'};const labels={rock:'✊ 바위',paper:'✋ 보',scissors:'✌️ 가위'};
 function playerNick(){return localStorage.getItem('arq_nickname')||'고객'}
-function monsterFight(choice){const available=state.monsters.slice(-3);if(!available.length)return null;const m=available[Math.floor(Math.random()*available.length)],arr=Object.keys(beats),ai=arr[Math.floor(Math.random()*3)],r=choice===ai?'DRAW':beats[choice]===ai?'WIN':'LOSE';return {monster:m,ai,r}}
-function opponentFromQuest(quest){const q=quest[Math.floor(Math.random()*quest.length)];const base=displayNameFor(q.physical_object_id);return {name:base,object:base,physical_object_id:q.physical_object_id}}
-function rpsResult(a,b){return a===b?'DRAW':beats[a]===b?'WIN':'LOSE'}
+function p3SelectOpponent(quest){const candidates=quest.map(q=>makeQuestMonster(q));const decision=P3_RULE_ENGINE.evaluate({contexts:state.personalContexts,battles:state.battles,candidates});if(!decision.applied||!decision.selected)return {opponent:candidates[Math.floor(Math.random()*candidates.length)],decision};return {opponent:decision.selected,decision};}
 function makeQuestMonster(q){const name=displayNameFor(q.physical_object_id);return {name,object:name,physical_object_id:q.physical_object_id}}
-function makeCollectedMonster(target){const symbol=['🦊','🐉','🦖','🦉','🐙','🐺','🦄'][Math.floor(Math.random()*7)];return {id:crypto.randomUUID(),name:target.name,object:target.name,time:new Date().toISOString(),symbol,physical_object_id:target.physical_object_id,species_key:canonicalBase(state.evidence.find(e=>e.physical_object_id===target.physical_object_id)?.ai_label||target.name),sourceEvidenceIds:state.evidence.filter(e=>e.physical_object_id===target.physical_object_id).map(e=>e.id),level:1,power:1,evidence_count:objectStatsById(target.physical_object_id).count}}
-function battle(choice){
- const quest=state.questObjects.map(q=>({...q}));
- const pending=state.battlePending;
- if(quest.length<3&&!pending){$('battleResult').textContent='다음 Battle을 시작하려면 새로운 객체 3개를 모아주세요.';return}
- state.battleUnlocked=true;
- const opponent=pending?.opponent||makeQuestMonster(quest[Math.floor(Math.random()*quest.length)]);
- let actor=null,actorType='customer';
- if(pending?.actorType==='monster'){
-  actor=state.monsters.find(m=>m.id===pending.actorId)||null;
-  if(actor)actorType='collected_monster';
+function makeCollectedMonster(target){const symbols=['🦊','🐉','🦖','🦉','🐙','🐺','🦄'];const used=new Set(state.monsters.map(m=>m.symbol).filter(Boolean));const available=symbols.filter(s=>!used.has(s));const pool=available.length?available:symbols;const symbol=pool[Math.floor(Math.random()*pool.length)];return {id:crypto.randomUUID(),name:target.name,object:target.name,time:new Date().toISOString(),symbol,physical_object_id:target.physical_object_id,species_key:canonicalBase(state.evidence.find(e=>e.physical_object_id===target.physical_object_id)?.ai_label||target.name),sourceEvidenceIds:state.evidence.filter(e=>e.physical_object_id===target.physical_object_id).map(e=>e.id),level:1,power:1,evidence_count:objectStatsById(target.physical_object_id).count}}
+function resolveBattleActor(monsters,pending){
+ const team=Array.isArray(monsters)?monsters.filter(m=>m&&typeof m==='object'):[];
+ if(pending?.actorType==='monster'||pending?.actorType==='collected_monster'){
+  const actor=team.find(m=>m.id===pending.actorId);
+  if(actor)return {actor,actorType:'collected_monster',pending,resumed:true,candidates:team};
  }
- if(!actor&&pending?.actorType==='customer')actorType='customer';
- if(!pending){
-  const candidates=state.monsters.slice(-3);
-  if(candidates.length){actor=candidates[Math.floor(Math.random()*candidates.length)];actorType='collected_monster';}
+ if(team.length){
+  return {actor:null,actorType:'collected_monster',pending:pending?.opponent?{...pending,actorType:'monster',actorId:null}:null,resumed:!!pending?.opponent,candidates:team.slice(-3)};
  }
- const actorName=actor?actor.name||actor.object:playerNick();
- const actorChoice=choice,opponentChoice=Object.keys(beats)[Math.floor(Math.random()*3)],r=rpsResult(actorChoice,opponentChoice);
- const rec={time:new Date().toISOString(),actor:actorName,actorType,opponent:opponent.name,opponentPhysicalObjectId:opponent.physical_object_id||null,opponentType:'quest_monster',result:r,choice:actorChoice,ai:opponentChoice,acquired:null,questObjects:quest.map(q=>q.name)};
- $('battleResult').innerHTML=`${esc(actorName)} ${labels[actorChoice]} · ${esc(opponent.name)} MONSTER ${labels[opponentChoice]} → <b class="${r==='WIN'?'good':r==='LOSE'?'bad':'warn'}">${r}</b>`;
+ if(pending?.opponent){
+  return {actor:null,actorType:'customer',pending:{...pending,actorType:'customer',actorId:null},resumed:true,candidates:[]};
+ }
+ return {actor:null,actorType:'customer',pending:null,resumed:false,candidates:[]};
+}
+function selectedGame(){return window.ARQGameRegistry.get(state.selectedGameId)||window.ARQGameRegistry.get('rps')||window.ARQGameRegistry.list()[0]||null}
+function renderGameModule(){
+ const registry=window.ARQGameRegistry,select=$('gameSelector'),modules=registry.list();
+ if(!modules.length){$('gameDescription').textContent='사용 가능한 게임 모듈이 없습니다.';$('gameControls').innerHTML='';return}
+ if(!modules.some(m=>m.id===state.selectedGameId))state.selectedGameId=modules[0].id;
+ select.innerHTML=modules.map(m=>`<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('');select.value=state.selectedGameId;
+ const game=selectedGame();$('gameDescription').textContent=game.description||'';
+ game.renderControls($('gameControls'),action=>battle(action),{getState:()=>state,gameId:game.id});
+}
+function handleGameOutcome({choice,game,actor,actorType,opponent,p3Info,quest,gameOutcome}){
+ const actorName=actor?actor.name||actor.object:playerNick(),r=gameOutcome.result;
+ if(!['WIN','LOSE','DRAW'].includes(r))throw new Error('Game module returned an unsupported result: '+r);
+ const actorAction=gameOutcome.playerAction??String(choice),opponentAction=gameOutcome.opponentAction??'—';
+ const rec={time:new Date().toISOString(),actor:actorName,actorType,actorPhysicalObjectId:actor?.physical_object_id||null,opponent:opponent.name,opponentPhysicalObjectId:opponent.physical_object_id||null,opponentType:'quest_monster',result:r,choice:actorAction,ai:opponentAction,gameId:game.id,gameName:game.name,gameMetadata:gameOutcome.metadata||null,acquired:null,missed:null,lostFromCollection:null,questObjects:quest.map(q=>q.name),p3:p3Info,message:gameOutcome.message||game.name};
+ $('battleResult').innerHTML=`<b>게임:</b> ${esc(game.name)} · <b>우리팀:</b> ${esc(actorName)} (${esc(actorAction)}) · <b>상대팀:</b> ${esc(opponent.name)} (${esc(opponentAction)}) → <b class="${r==='WIN'?'good':r==='LOSE'?'bad':'warn'}">${r}</b><br><span class="${p3Info.applied?'good':'note'}">${p3Info.applied?'🤖 P3 Rule Engine 개입':'P3 Rule Engine 미개입'} · <b>대상: 상대팀 몬스터 선택</b> · ${esc(p3Info.engine)} · ${esc(p3Info.reason)}</span>${gameOutcome.message?`<br><span class="note">${esc(gameOutcome.message)}</span>`:''}`;
  if(r==='DRAW'){
-  rec.message='무승부입니다. 다시 승부하세요.';state.battles.push(rec);state.battlePending={actorType,actorId:actor?.id||null,actorName,opponent};save();
+  rec.message='무승부입니다. 같은 출전자와 상대가 다시 승부합니다.';state.battles.push(rec);state.battlePending={actorType,actorId:actor?.id||null,actorName,opponent};save();
   $('battleResult').innerHTML+=`<br><span class="warn">무승부입니다. 다시 승부하세요.</span>`;render();return;
  }
  if(r==='WIN'){
   const monster=makeCollectedMonster(opponent);state.monsters.push(monster);rec.acquired=monster.name+' MONSTER';
   rec.message=actorType==='collected_monster'?'수집 몬스터 승리 · 상대 몬스터 수집':'고객 승리 · 상대 몬스터 수집';
-  $('battleResult').innerHTML+=`<br><span class="good">${esc(actorName)} ${actorType==='collected_monster'?'MONSTER가':'승리했습니다.'}</span><br><span class="good">Monster Collection에 ${esc(monster.name)} MONSTER가 수집되었습니다.</span>`;
+  $('battleResult').innerHTML+=`<br><span class="good">${esc(actorName)}가 ${esc(opponent.name)}을 이겨서 Monster Collection에 ${esc(opponent.name)}를 수집하였습니다.</span>`;
   toast(`${monster.name} MONSTER 수집 완료!`);state.battles.push(rec);state.battlePending=null;state.questObjects=[];save();render();return;
  }
- // LOSE
  if(actorType==='collected_monster'&&actor){
   state.monsters=state.monsters.filter(x=>x.id!==actor.id);
   const candidates=state.monsters.slice(-3),next=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:null;
   state.battlePending=next?{actorType:'monster',actorId:next.id,actorName:next.name,opponent}:{actorType:'customer',actorId:null,actorName:playerNick(),opponent};
-  rec.message='출전 Monster 패배 · 다음 출전자 대기';$('battleResult').innerHTML+=`<br><span class="bad">${esc(actorName)} MONSTER가 패배했습니다. Monster Collection에서 사라졌습니다.</span><br><span class="note">다음으로 ${next?esc(next.name||next.object)+' MONSTER':'고객 '+esc(playerNick())}가 출전합니다. 아래에서 가위·바위·보를 선택하세요.</span>`;
+  rec.missed=actorName+' MONSTER';rec.lostFromCollection={monsterId:actor.id,physical_object_id:actor.physical_object_id||null,name:actorName};
+  rec.message='출전 Monster 패배 · Monster Collection에서 제거 · 다음 출전자 대기';
+  $('battleResult').innerHTML+=`<br><span class="bad">${esc(actorName)}가 ${esc(opponent.name)}에게 져서 Monster Collection에서 ${esc(actorName)}이 사라졌습니다.</span><br><span class="note">다음으로 ${next?esc(next.name||next.object)+' MONSTER':'고객 '+esc(playerNick())}가 출전합니다.</span>`;
   state.battles.push(rec);save();render();return;
  }
- state.battles.push(rec);state.battlePending=null;state.questObjects=[];save();$('battleResult').innerHTML+=`<br><span class="bad">패배했습니다. 다시 객체 3개를 모으세요.</span>`;toast('패배했습니다. 다시 객체 3개를 모아주세요.');render();
+ rec.missed=opponent.name+' MONSTER';rec.message='고객 패배 · 상대 몬스터를 수집하지 못함';
+ state.battles.push(rec);state.battlePending=null;state.questObjects=[];save();$('battleResult').innerHTML+=`<br><span class="bad">${esc(actorName)}가 ${esc(opponent.name)}에게 패배했습니다. 다시 객체 3개를 모으세요.</span>`;toast('패배했습니다. 다시 객체 3개를 모아주세요.');render();
 }
-$('start').onclick=startCamera;$('scanBtn').onclick=scan;$('gps').onclick=gps;$('closeObjectView').onclick=closeObjectHistory;document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>battle(b.dataset.choice));$('newBattle').onclick=()=>{clearBattleResult();render()};render();
+function battle(choice){
+ const quest=state.questObjects.map(q=>({...q}));
+ const resolution=resolveBattleActor(state.monsters,state.battlePending);
+ let pending=resolution.pending;
+ let actor=resolution.actor,actorType=resolution.actorType;
+ if(!actor&&resolution.candidates.length){actor=resolution.candidates[Math.floor(Math.random()*resolution.candidates.length)];actorType='collected_monster';}
+ if(pending&&actorType==='collected_monster'&&actor)pending={...pending,actorType:'monster',actorId:actor.id,actorName:actor.name||actor.object};
+ state.battlePending=pending;
+ if(quest.length<3&&!pending){$('battleResult').textContent='다음 Battle을 시작하려면 새로운 객체 3개를 모아주세요.';return}
+ state.battleUnlocked=true;
+ const p3Selection=pending?{opponent:pending.opponent,decision:{applied:false,reason:'기존 Battle 진행 중'}}:p3SelectOpponent(quest);
+ const opponent=p3Selection.opponent,game=selectedGame();
+ if(!game){$('battleResult').textContent='게임 모듈을 불러오지 못했습니다.';return}
+ const p3Info={applied:!!p3Selection.decision?.applied,target:'opponent',engine:p3Selection.decision?.engine||P3_RULE_ENGINE_VERSION,reason:p3Selection.decision?.reason||'기존 Battle 진행 중',selectedPhysicalObjectId:opponent.physical_object_id||null};
+ const gameOutcome=choice&&typeof choice==='object'&&['WIN','LOSE','DRAW'].includes(choice.result)?choice:typeof game.resolveRound==='function'?game.resolveRound(choice,{actor,actorType,opponent,quest,random:Math.random}):null;
+ if(!gameOutcome||!['WIN','LOSE','DRAW'].includes(gameOutcome.result)){$('battleResult').textContent='게임 모듈이 유효한 WIN/LOSE/DRAW 결과를 반환하지 않았습니다.';return}
+ handleGameOutcome({choice,game,actor,actorType,opponent,p3Info,quest,gameOutcome});
+}
+$('start').onclick=startCamera;$('scanBtn').onclick=scan;$('gps').onclick=gps;$('closeObjectView').onclick=closeObjectHistory;$('gameSelector').onchange=()=>{state.selectedGameId=$('gameSelector').value;localStorage.setItem('arq_selected_game',state.selectedGameId);clearBattleResult();renderGameModule()};$('newBattle').onclick=()=>{clearBattleResult();render()};renderGameModule();render();
 </script>
 </body>
 </html>
