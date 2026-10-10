@@ -57,7 +57,34 @@ Human approval is required before:
 
 If a test fails, the AI should investigate and repair the failure before handing the work back. If a required capability is unavailable, it must state the exact limitation instead of pretending the check passed.
 
-## 5. Versioning rule
+## 5. Core vs. replaceable game modules
+
+The Reality Scanner, Evidence history, object identity/confirmation, Personal Context, My AI state, P3 opponent selection, Quest eligibility, Monster Collection, and battle-history persistence are core platform capabilities. They must not be duplicated or reimplemented inside a game module.
+
+The game mechanic is a replaceable module. The host owns the Quest lifecycle and applies normalized outcomes; a module owns only its rules, UI, and game-specific metadata.
+
+### Game module contract
+
+Each independently loaded JavaScript file registers a module with `window.ARQGameRegistry.register(module)`:
+- `id`: stable, unique identifier.
+- `name`: user-visible game name.
+- `description`: short explanation.
+- `renderControls(container, onAction, context)`: render any UI and report a user action through `onAction(action)`.
+- Optional `resolveRound(action, context)`: for turn-based games, return `{ result: 'WIN' | 'LOSE' | 'DRAW', playerAction, opponentAction, message?, metadata? }`.
+- A custom/asynchronous game such as Sudoku may call `onAction(normalizedOutcome)` only when the player completes or fails its task. The host accepts that same normalized outcome and owns collection changes, battle history, P3 context, and persistence.
+
+Do not put Reality Scanner, Evidence writes, My AI memory, P3 rules, Monster Collection mutation, or localStorage writes inside a game module. Include game-specific details in `metadata`, and use the shared result contract. Add a regression test for every module.
+
+### Required end-to-end invariants when modifying game modules
+
+- Switching games changes only the game module; it must not clear or alter Evidence, Personal Context, My AI state, P3 eligibility, or Monster Collection.
+- All games receive the same active actor and Quest opponent selected by the host; P3 continues to affect opponent selection only.
+- A normalized DRAW preserves the same actor and opponent; WIN/LOSE continue through the shared collection lifecycle.
+- Battle history records the game ID/name, actions, normalized result, actor physical-object ID, opponent physical-object ID, P3 decision/reason, and game metadata.
+- Losing a collected Monster must be recorded as both a collection-loss event and one missed/lost event for that object's My AI history, while remaining distinguishable from failing to capture an opponent.
+- Student-created modules must be independently addable/removable without editing the scanner, Evidence, My AI, P3, or core collection code.
+
+## 6. Versioning rule
 
 - Update the **existing** visible version badge and document title on every version bump.
 - Keep the app/schema version consistent with the version being tested.
@@ -65,7 +92,7 @@ If a test fails, the AI should investigate and repair the failure before handing
 - Search for stale version strings and verify the visible badge, title, schema marker, commit, and test expectations agree.
 - Every versioned commit must state the version and purpose.
 
-## 6. AI Reality Quest battle invariant
+## 7. AI Reality Quest battle invariant
 
 **If at least one valid Monster exists on our team, the customer must not be selected as the active fighter.**
 
