@@ -18,7 +18,9 @@ function loadModules() {
 
 test('registry exposes independently registered RPS and odd-even modules', () => {
   const sandbox = loadModules();
-  assert.deepEqual(sandbox.ARQGameRegistry.list().map(x => x.id), ['rps', 'odd-even']);
+  assert.equal(sandbox.ARQGameRegistry.list().length, 2);
+  assert.equal(sandbox.ARQGameRegistry.list()[0].id, 'rps');
+  assert.equal(sandbox.ARQGameRegistry.list()[1].id, 'odd-even');
   assert.equal(sandbox.ARQGameRegistry.get('rps').name, '가위바위보');
   assert.equal(sandbox.ARQGameRegistry.get('odd-even').name, '홀짝');
 });
