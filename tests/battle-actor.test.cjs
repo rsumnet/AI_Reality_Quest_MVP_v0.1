@@ -9,9 +9,9 @@ assert.ok(inlineScript, 'inline application script exists');
 new vm.Script(inlineScript[1], { filename: 'index.html inline script' });
 
 test('visible app version, document title, and evidence schema version agree', () => {
-  assert.match(html, /<title>AI Reality Quest — MVP v0\.4\.7<\/title>/);
-  assert.match(html, /MVP v0\.4\.7 · Browser \/ On-device inference/);
-  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.4\.7';/);
+  assert.match(html, /<title>AI Reality Quest — MVP v0\.4\.8<\/title>/);
+  assert.match(html, /MVP v0\.4\.8 · Browser \/ On-device inference/);
+  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.4\.8';/);
   assert.doesNotMatch(html, /v0\.4\.[0-5](?:\D|$)/);
 });
 
@@ -290,4 +290,18 @@ test('losing the first collected My AI Monster persists its identity and increme
   const totals = sandbox.battleStatsFrom(state.battles, 'my-ai-fire-hydrant');
   assert.equal(totals.ownMonsterLosses, 1);
   assert.equal(totals.missed, 1);
+});
+
+
+test('quest prompt uses selected game module and protects battle result text', () => {
+  const start = inlineScript[1].indexOf('function questPromptText()');
+  const end = inlineScript[1].indexOf('\nfunction clearBattleResult', start);
+  assert.ok(start >= 0 && end > start, 'quest prompt helper exists');
+  const sandbox = { state: { questObjects: [] }, selectedGame: () => ({ name: '주사위' }) };
+  vm.runInNewContext(inlineScript[1].slice(start, end) + '\nthis.questPromptText = questPromptText;', sandbox);
+  assert.equal(sandbox.questPromptText(), '아직 3개 객체를 모으지 않았습니다.');
+  sandbox.state.questObjects = [{ name: 'A' }, { name: 'B' }, { name: 'C' }];
+  assert.ok(sandbox.questPromptText().includes('주사위'), 'prompt uses selected game module name');
+  assert.ok(inlineScript[1].includes('객체 3개 수집 완료! 이제 게임을 시작할 수 있습니다.'), 'completion toast exists');
+  assert.ok(inlineScript[1].includes('state.battleOutcomeShown=true'), 'battle result text is protected from overwrite');
 });
