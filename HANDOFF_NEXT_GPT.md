@@ -189,7 +189,7 @@ Treat this as a **proposed sequence**, not a promise or a fixed delivery schedul
 
 ### Phase 0 — Stabilize the current vertical slice
 
-1. Confirm `main` contains the merged v0.4.7 change and the repository is clean/consistent.
+1. Confirm `main` contains the merged v0.4.8 change and the repository is clean/consistent.
 2. Run the full test suite and check CI against current `main`.
 3. Verify version title/badge/schema and remove stale version strings.
 4. Perform a concise browser smoke test for the end-to-end flow: camera → scan → Evidence → confirmation → Quest progress → three objects → game selector → battle outcome → Collection/History.
@@ -199,7 +199,7 @@ Treat this as a **proposed sequence**, not a promise or a fixed delivery schedul
    - the same confirmed object is later re-observed and is eligible for P3 in a new Quest;
    - P3 affects the opponent only.
 6. Verify low-confidence later observations do not reduce confirmation status or incorrectly reduce collection/Quest counts.
-7. Verify the prompt/UI changes appropriately when all three Quest objects have been captured. This was a desired behavior; do not assume it is complete unless the current code and a reproducible test prove it.
+7. The v0.4.8 regression suite verifies the selected game name in the three-object Quest prompt, the completion toast, and protection against battle-result text being overwritten. The user also confirmed smartphone game testing on 2026-10-18.
 8. Ensure WIN, LOSE, DRAW messages identify both participants and the game result clearly.
 9. Record actual browser/device findings separately from automated CI results.
 
