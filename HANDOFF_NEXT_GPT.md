@@ -9,14 +9,15 @@
 
 - **Repository:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1
 - **Default branch:** `main`
-- **Latest verified app version:** `MVP v0.4.7`
+- **Latest verified app version:** `MVP v0.4.8` (release candidate; branch CI must pass before merge)
 - **Latest merged change:** PR #4, squash-merged on 2026-10-11
 - **Merge commit:** `d0a3febba00b2c62cd4dfbb4e0c07d424e975680`
 - **Merged PR:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/4
 - **PR head tested by CI:** `88bb31a5351a97d47247a44c33514d9e8978b6aa`
 - **CI:** “Verify MVP”, run #58 / run ID 38051982141; conclusion: success
 - **Test result:** 27 automated tests passed, 0 failed on the PR head.
-- **User runtime check:** The user explicitly tested the real browser and confirmed that game selection and switching between games work.
+- **User runtime check (2026-10-18):** The user confirms completing all game tests on a smartphone; all game tests were reported normal. Device model, OS, and browser version were not recorded.
+- **Automated release check:** The v0.4.8 ZIP previously passed 32 isolated Node tests; this is not a substitute for the release branch's GitHub Actions result.
 - **Still not proven by automated tests:** camera permission/live feed, actual on-device model inference, GPS permission/location behavior, touch/responsive behavior on target devices, and persistence behavior across real browser origins.
 
 The current source of truth is the repository, especially:
