@@ -5,9 +5,11 @@
 ## 1. 자동화 검증
 
 - 기준 버전: AI Reality Quest v0.4.8
-- 자동화 테스트: GitHub Actions CI 결과 확인 전에는 미확정
+- GitHub Actions: “Verify MVP”, run #62 / run ID 39113538132 — **success**
+- PR #5 head: `db805d98ef50c3bbf4861b5b302ceb92eacb2816`
+- 결과: **34 tests / 34 pass / 0 fail** (Node.js 20.20.2, GitHub-hosted Ubuntu runner)
 - 대상: `tests/battle-actor.test.cjs`, `tests/game-modules.test.cjs`, `tests/core-loop.test.cjs`
-- 이전에 ZIP에서 격리 실행한 결과: 32개 통과, 0개 실패. 이는 GitHub Actions CI 결과와 동일한 것으로 간주하지 않습니다.
+- ZIP 사전 격리 실행 결과는 32개 통과였으며, 위 GitHub Actions 결과와는 별도로 기록합니다.
 
 ## 2. 사용자 확인 실기기 테스트
 
