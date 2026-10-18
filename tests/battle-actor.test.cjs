@@ -217,8 +217,8 @@ test('P3 does not intervene on a first encounter and requires losing the same co
 });
 
 test('Quest prompt changes automatically when the third confirmed object is added', () => {
-  assert.ok(inlineScript[1].includes('게임 재료를 다 모았네요. 가위바위보 중에 하나를 고르세요.'));
-  assert.ok(inlineScript[1].includes("state.questObjects.length>=3&&$('battleResult').textContent==='아직 3개 객체를 모으지 않았습니다.'"));
+  assert.ok(inlineScript[1].includes('function questPromptText()'));
+  assert.ok(inlineScript[1].includes("if(!state.battleOutcomeShown&&$('battleResult').textContent==='아직 3개 객체를 모으지 않았습니다.')"));
 });
 
 test('win and loss messages identify both monsters and the collection change', () => {
