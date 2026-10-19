@@ -116,7 +116,7 @@ Registered through `window.ARQGameRegistry`. Current modules on merged `main` (v
 - `games/odd-even.js` — Odd/Even.
 - `games/dice.js` — Dice.
 
-The v0.5.0 candidate branch `v0.5.0-p1-game-modules` adds `games/yut.js` and `games/sudoku.js`; it remains unmerged until the user performs the agreed minimal final device check.
+The merged v0.5.0 release includes `games/yut.js` and `games/sudoku.js`; the user confirmed both games work in the Codespaces preview, and the Pages deployment workflow succeeded. Direct production-page confirmation remains pending.
 
 The game selector allows the user to change the game module. The user tested this in the actual browser and confirmed switching works.
 
@@ -301,7 +301,7 @@ Preserve the project mission: “AI에게 세상을 가르치고, AI와 함께 �
 
 Follow the full development constitution. For each requested change, trace the entire connected behavior chain—state writers/readers, transitions, UI, persistence, history/statistics, and downstream rules. Define acceptance criteria, implement the smallest complete fix, add regression tests, run all relevant tests and CI on the exact commit, inspect the diff, and clearly state what was not tested. Do not ask the human to repeat information already available. Never claim a test passed without observing the result. Never merge a PR without explicit user approval.
 
-Do not expand to AR/XR or other large features before stabilizing the smallest engine. Start from the merged v0.4.9 baseline. PR #7 v0.5.0 CI passes 37/37, but it remains unmerged until the user performs the minimal final device check. After that check, merge only after explicit confirmation and verify Pages deployment; then validate the separate v0.5.1 localStorage migration.
+Do not expand to AR/XR or other large features before stabilizing the smallest engine. The current main release is v0.5.0 (PR #7 merged, CI and Pages deployment succeeded). The next candidate is v0.5.1 localStorage migration on PR #8; run CI on the exact latest head, review the diff, and never merge until the user completes the final browser/device check and explicitly approves.
 
 
 ## Current handoff update — 2026-10-19
