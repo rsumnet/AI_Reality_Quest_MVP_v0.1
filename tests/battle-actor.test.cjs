@@ -11,7 +11,7 @@ new vm.Script(inlineScript[1], { filename: 'index.html inline script' });
 test('visible app version, document title, and evidence schema version agree', () => {
   assert.match(html, /<title>AI Reality Quest — MVP v0\.5\.1<\/title>/);
   assert.match(html, /MVP v0\.5\.1 · Browser \/ On-device inference/);
-  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.5\.0';/);
+  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.5\.1';/);
   assert.doesNotMatch(html, /v0\.4\.[0-5](?:\D|$)/);
 });
 
