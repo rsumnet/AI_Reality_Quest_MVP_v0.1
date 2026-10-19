@@ -10,6 +10,7 @@
     id:'sudoku',
     name:'스도쿠 4×4',
     description:'4×4 스도쿠의 빈 칸(·)에 들어갈 숫자(1~4)를 고르면 승리합니다.',
+    metadata:{apiVersion:1,version:'1.0.0',difficulty:'쉬움',tags:['퍼즐','논리']},
     renderControls(container,onAction){
       current=PUZZLES[Math.floor(Math.random()*PUZZLES.length)];
       container.innerHTML='';

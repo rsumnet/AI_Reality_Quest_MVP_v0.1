@@ -16,6 +16,7 @@
     id:'yut',
     name:'윷놀이',
     description:'네 개의 윷을 던져 더 높은 등급(도<개<걸<윷<모)을 만든 쪽이 승리합니다. 같은 등급이면 무승부입니다.',
+    metadata:{apiVersion:1,version:'1.0.0',difficulty:'쉬움',tags:['전통놀이','확률']},
     renderControls(container,onAction){
       container.innerHTML='';
       const button=document.createElement('button');

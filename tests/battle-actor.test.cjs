@@ -9,9 +9,9 @@ assert.ok(inlineScript, 'inline application script exists');
 new vm.Script(inlineScript[1], { filename: 'index.html inline script' });
 
 test('visible app version, document title, and evidence schema version agree', () => {
-  assert.match(html, /<title>AI Reality Quest — MVP v0\.5\.1<\/title>/);
-  assert.match(html, /MVP v0\.5\.1 · Browser \/ On-device inference/);
-  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.5\.1';/);
+  assert.match(html, /<title>AI Reality Quest — MVP v0\.5\.2<\/title>/);
+  assert.match(html, /MVP v0\.5\.2 · Browser \/ On-device inference/);
+  assert.match(inlineScript[1], /const ARQ_SCHEMA_VERSION='0\.5\.2';/);
   assert.doesNotMatch(html, /v0\.4\.[0-5](?:\D|$)/);
 });
 
@@ -137,6 +137,8 @@ test('battle integration never sends the customer out while a team monster remai
     render: () => {},
     toast: () => {}
   };
+  sandbox.window = sandbox;
+  vm.runInNewContext(fs.readFileSync('games/game-runtime.js', 'utf8'), sandbox, { filename: 'games/game-runtime.js' });
   vm.runInNewContext(outcomeMatch[0] + '\n' + battleMatch[0] + '\nthis.battle = battle;', sandbox);
 
   sandbox.battle('rock'); // rock vs rock => DRAW
@@ -258,8 +260,8 @@ test('Quest games are loaded from replaceable modules rather than hard-coded RPS
   assert.match(html, /games\/odd-even\.js/);
   assert.match(html, /games\/dice\.js/);
   assert.match(html, /id="gameSelector"/);
-  assert.match(html, /game\.renderControls\(\$\('gameControls'\),action=>battle\(action\)/);
-  assert.match(inlineScript[1], /game\.resolveRound\(choice,\{actor,actorType,opponent,quest,random:Math\.random\}\)/);
+  assert.match(html, /ARQGameRuntime\.renderControls\(game,\$\('gameControls'\),action=>battle\(action\)/);
+  assert.match(inlineScript[1], /ARQGameRuntime\.resolveRound\(game,choice,\{actor,actorType,opponent,quest,random:Math\.random\}\)/);
 });
 
 test('losing the first collected My AI Monster persists its identity and increments missed exactly once', () => {

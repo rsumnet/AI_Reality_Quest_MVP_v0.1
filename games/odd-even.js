@@ -3,6 +3,7 @@
     id:'odd-even',
     name:'홀짝',
     description:'상대 몬스터가 굴린 주사위 결과의 홀짝을 예측합니다.',
+    metadata:{apiVersion:1,version:'1.0.0',difficulty:'쉬움',tags:['예측','주사위']},
     renderControls(container,onAction){
       container.innerHTML='';
       for(const action of ['odd','even']){
