@@ -73,7 +73,7 @@ test('migration is idempotent after the current schema marker is written', () =>
   const second = loadMigration(storage);
   assert.equal(first.migrated, false);
   assert.equal(second.migrated, false);
-  assert.deepEqual(second.warnings, []);
+  assert.equal(second.warnings.length, 0);
   assert.deepEqual(storage.dump(), snapshot);
 });
 
