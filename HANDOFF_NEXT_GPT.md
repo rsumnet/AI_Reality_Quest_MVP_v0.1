@@ -17,7 +17,7 @@
 - **Pages:** build/deployment run #16 / ID `39189401919` succeeded on merge commit `d1f56f4ca9b7d57de1e64b9984bb92928fa139d5`.
 - **User preview check:** user confirmed v0.5.0 displayed and Yut + 4×4 Sudoku worked in Codespaces preview. Direct live Pages check remains pending.
 - **User runtime check (2026-10-18):** The user confirms completing all game tests on a smartphone; all game tests were reported normal. Device model, OS, and browser version were not recorded.
-- **User Pages check (2026-10-19):** The user confirmed the live page continued to show v0.4.8 after refresh. The v0.4.9 Pages workflow has now succeeded on the merge commit; direct user-visible v0.4.9 confirmation is still pending.
+- **Historical Pages check (2026-10-19, before PR #7):** The user previously observed v0.4.8 on the live page despite a successful v0.4.9 workflow. After that, PR #7 was merged and Pages workflow #16 succeeded for v0.5.0; direct production-page confirmation of v0.5.0 is still pending.
 - **Automated release check:** The v0.4.8 ZIP previously passed 32 isolated Node tests; this is not a substitute for GitHub Actions.
 - **Still not proven by automated tests:** camera permission/live feed, actual on-device model inference, GPS permission/location behavior, touch/responsive behavior on target devices, and persistence behavior across real browser origins.
 
