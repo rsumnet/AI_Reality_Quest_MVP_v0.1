@@ -36,10 +36,12 @@
     let changed = previousVersion !== VERSION;
     for (const [field, key] of Object.entries(ARRAY_KEYS)) {
       const read = readJSON(storage, key, [], warnings);
+      const hasUnexpectedType = read.valid && read.present && !Array.isArray(read.value);
+      if (hasUnexpectedType) warnings.push(key);
       const normalized = asArray(read.value);
       data[field] = normalized;
       if (!sameJSON(read.value, normalized)) changed = true;
-      if (read.valid && read.present && !sameJSON(read.value, normalized)) {
+      if (read.valid && read.present && !hasUnexpectedType && !sameJSON(read.value, normalized)) {
         try { storage.setItem(key, JSON.stringify(normalized)); } catch (_) { warnings.push(key); }
       }
     }
@@ -58,12 +60,12 @@
     }
     for (const [field, key] of Object.entries(JSON_KEYS)) {
       const read = readJSON(storage, key, null, warnings);
-      const value = field === 'battlePending'
-        ? (read.value && typeof read.value === 'object' && !Array.isArray(read.value) ? read.value : null)
-        : (read.value && typeof read.value === 'object' && !Array.isArray(read.value) ? read.value : null);
+      const isObjectOrNull = read.value === null || (typeof read.value === 'object' && !Array.isArray(read.value));
+      if (read.valid && read.present && !isObjectOrNull) warnings.push(key);
+      const value = isObjectOrNull ? read.value : null;
       data[field] = value;
       if (!sameJSON(read.value, value)) changed = true;
-      if (read.valid && read.present && !sameJSON(read.value, value)) {
+      if (read.valid && read.present && isObjectOrNull && !sameJSON(read.value, value)) {
         try { storage.setItem(key, JSON.stringify(value)); } catch (_) { warnings.push(key); }
       }
     }
