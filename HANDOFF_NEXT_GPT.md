@@ -308,5 +308,5 @@ Do not expand to AR/XR or other large features before stabilizing the smallest e
 
 - v0.5.0 is merged and Pages deployment workflow #16 succeeded on `d1f56f4ca9b7d57de1e64b9984bb92928fa139d5`.
 - User has not yet confirmed the production Pages URL itself displays v0.5.0; this is part of the next minimal manual check.
-- v0.5.1 is being prepared on `v0.5.1-storage-migration` to add versioned localStorage migration while preserving Evidence, Monsters, Battles, Personal Context, and Quest progress. Migration tests are being added for legacy Quest-object strings, idempotence, malformed JSON non-overwrite, and schema marker behavior.
+- v0.5.1 is being prepared on `v0.5.1-storage-migration` to add versioned localStorage migration while preserving Evidence, Monsters, Battles, Personal Context, and Quest progress. Migration tests cover legacy Quest-object strings, stable Evidence IDs/schemaVersion, Personal Context schemaVersion normalization, malformed JSON recovery, legacy pending-state preservation, and idempotence.
 - Never merge v0.5.1 without explicit user approval after the final browser/device test. Expected next manual check: verify v0.5.0 live production page first, then preview v0.5.1 with pre-existing localStorage data and confirm counts/history/context survive refresh.
