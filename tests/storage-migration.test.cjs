@@ -90,16 +90,22 @@ test('malformed saved JSON is reported and left untouched rather than overwritte
   assert.deepEqual(JSON.parse(storage.getItem('arq_monsters')), [{ id: 'm1' }]);
 });
 
-test('non-array legacy values normalize to empty collections without crashing', () => {
+test('unexpected saved data types are reported and preserved rather than overwritten', () => {
+  const originalEvidence = JSON.stringify({ unexpected: true });
+  const originalBattles = JSON.stringify(null);
   const storage = makeStorage({
     arq_schema_version: '0.4.8',
-    arq_evidence: JSON.stringify({ unexpected: true }),
-    arq_battles: JSON.stringify(null)
+    arq_evidence: originalEvidence,
+    arq_battles: originalBattles
   });
   const migrated = loadMigration(storage);
   assert.deepEqual(JSON.parse(JSON.stringify(migrated.evidence)), []);
   assert.deepEqual(JSON.parse(JSON.stringify(migrated.battles)), []);
-  assert.equal(migrated.migrated, true);
+  assert.ok(migrated.warnings.includes('arq_evidence'));
+  assert.ok(migrated.warnings.includes('arq_battles'));
+  assert.equal(storage.getItem('arq_evidence'), originalEvidence);
+  assert.equal(storage.getItem('arq_battles'), originalBattles);
+  assert.notEqual(storage.getItem('arq_schema_version'), '0.5.1');
 });
 
 test('the host saves the active schema version with normal persisted state', () => {
