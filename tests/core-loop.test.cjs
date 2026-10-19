@@ -11,7 +11,7 @@ const script = match[1];
 test('v0.5.1 title, badge, and schema version agree', () => {
   assert.match(html, /<title>AI Reality Quest — MVP v0\.5\.1<\/title>/);
   assert.match(html, /MVP v0\.5\.1 · Browser \/ On-device inference/);
-  assert.match(script, /const ARQ_SCHEMA_VERSION='0\.5\.0';/);
+  assert.match(script, /const ARQ_SCHEMA_VERSION='0\.5\.1';/);
 });
 
 test('P3 engine exposes reusable eligibility rules', () => {
