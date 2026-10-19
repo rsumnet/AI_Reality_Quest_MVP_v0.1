@@ -16,6 +16,20 @@ function loadModules() {
   return sandbox;
 }
 
+test('all built-in games expose normalized metadata', () => {
+  const sandbox = loadModules();
+  const modules = sandbox.ARQGameRegistry.list();
+  assert.equal(modules.length, 5);
+  for (const module of modules) {
+    assert.equal(module.metadata.apiVersion, 1);
+    assert.equal(typeof module.metadata.version, 'string');
+    assert.ok(module.metadata.version.length > 0);
+    assert.equal(typeof module.metadata.difficulty, 'string');
+    assert.ok(Array.isArray(module.metadata.tags));
+    assert.ok(module.metadata.tags.length > 0);
+  }
+});
+
 test('registry exposes independently registered RPS and odd-even modules', () => {
   const sandbox = loadModules();
   assert.equal(sandbox.ARQGameRegistry.list().length, 5);
