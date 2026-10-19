@@ -117,4 +117,3 @@ test('sudoku module resolves correct and incorrect guesses through the normalize
   assert.equal(lose.result, 'LOSE', '오답은 LOSE');
   assert.equal(win.metadata.gameId, 'sudoku');
 });
-});
