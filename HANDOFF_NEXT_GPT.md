@@ -9,7 +9,7 @@
 
 - **Repository:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1
 - **Default branch:** `main`
-- **Latest merged app version:** `MVP v0.4.9`; v0.5.0 candidate branch `v0.5.0-p1-game-modules` is not merged (CI passed; GitHub Pages deployment workflow succeeded, live text not yet re-confirmed by the user)
+- **Latest merged app version:** `MVP v0.4.9` (Pages deployment workflow succeeded; live text not yet re-confirmed by the user). The v0.5.0 candidate is in PR #7 and is not merged.
 - **Latest merged change:** PR #6, merge-commit merged on 2026-10-19
 - **Merge commit:** `a1c33e3f7f0fec9a25a0971ee442401e1b95d0c2`
 - **Merged PR:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/6
@@ -158,16 +158,15 @@ The merged fix:
 
 ### Merged baseline v0.4.9
 
-### v0.5.0 candidate (not merged)
+### v0.5.0 candidate (PR #7, not merged)
 
-- Replaceable game modules (RPS, Odd/Even, Dice).
-- Shared normalized result contract and host-owned battle lifecycle.
-- My AI collected-Monster loss history/statistic fix.
-- Merged baseline: title, visible version badge, and schema marker aligned to v0.4.9.
-- v0.5.0 candidate adds Yut and 4×4 Sudoku and keeps the v0.4.9 P3 regression tests.
-- Development constitution expanded to require end-to-end traceability and module invariants.
-- CI passed on the exact PR head: 35 tests, 0 failures, including an integrated P3 re-observation regression test.
-- The user manually confirmed game selection and switching work in the actual browser.
+- Adds `games/yut.js` and `games/sudoku.js`; shared core and battle lifecycle remain unchanged.
+- Keeps the v0.4.9 P3 regression coverage and adds two game-module contract tests.
+- PR head: `3848bbe08b6a9be5420a40378ec3e3e2369a1547`.
+- GitHub Actions run #74 / ID `39183338584`: **37/37 tests pass**.
+- An earlier candidate CI run failed on a test-file syntax error; the extra closing brace was removed and the full suite passed on the exact head above.
+- PR link: https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/7.
+- **Human final check pending:** verify visible v0.5.0, play one Yut round, play one Sudoku round, and confirm the shared result flow remains usable. Do not merge before that check.
 
 ### Automated tests cover
 
@@ -303,4 +302,4 @@ Preserve the project mission: “AI에게 세상을 가르치고, AI와 함께 �
 
 Follow the full development constitution. For each requested change, trace the entire connected behavior chain—state writers/readers, transitions, UI, persistence, history/statistics, and downstream rules. Define acceptance criteria, implement the smallest complete fix, add regression tests, run all relevant tests and CI on the exact commit, inspect the diff, and clearly state what was not tested. Do not ask the human to repeat information already available. Never claim a test passed without observing the result. Never merge a PR without explicit user approval.
 
-Do not expand to AR/XR or other large features before stabilizing the smallest engine. Start from the merged v0.4.9 baseline. The merged v0.4.9 CI suite passed 35 tests; v0.5.0 candidate CI must be checked separately. The user confirmed smartphone game-module testing on v0.4.8; v0.4.9 still needs live-page confirmation. Next, verify the deployed version and then consider migration tests for older localStorage schema/state.
+Do not expand to AR/XR or other large features before stabilizing the smallest engine. Start from the merged v0.4.9 baseline. PR #7 v0.5.0 CI passes 37/37, but it remains unmerged until the user performs the minimal final device check. After that check, merge only after explicit confirmation and verify Pages deployment; then validate the separate v0.5.1 localStorage migration.
