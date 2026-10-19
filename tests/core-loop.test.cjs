@@ -15,9 +15,9 @@ test('v0.5.2 title, badge, and schema version agree', () => {
 });
 
 test('shared runtime adapters are loaded before the application initializes', () => {
-  assert.match(html, /games\\/game-runtime\\.js/);
-  assert.match(html, /core\\/my-ai-runtime\\.js/);
-  assert.match(html, /core\\/xr-bridge\\.js/);
+  assert.match(html, /games\/game-runtime\.js/);
+  assert.match(html, /core\/my-ai-runtime\.js/);
+  assert.match(html, /core\/xr-bridge\.js/);
 });
 
 test('P3 engine exposes reusable eligibility rules', () => {
