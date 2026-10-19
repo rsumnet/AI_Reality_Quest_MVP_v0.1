@@ -9,15 +9,17 @@
 
 - **Repository:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1
 - **Default branch:** `main`
-- **Latest verified app version:** `MVP v0.4.8`
-- **Latest merged change:** PR #5, merge-commit merged on 2026-10-18
-- **Merge commit:** `0e17726568e7fee021fd257f69528f1c76f84a65`
-- **Merged PR:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/5
-- **PR head tested by CI:** `db805d98ef50c3bbf4861b5b302ceb92eacb2816`
-- **CI:** “Verify MVP”, run #62 / run ID 39113538132; conclusion: success
-- **Test result:** 34 automated tests passed, 0 failed on the PR head.
+- **Latest verified app version:** `MVP v0.4.9` (CI passed; GitHub Pages deployment workflow succeeded, live text not yet re-confirmed by the user)
+- **Latest merged change:** PR #6, merge-commit merged on 2026-10-19
+- **Merge commit:** `a1c33e3f7f0fec9a25a0971ee442401e1b95d0c2`
+- **Merged PR:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/6
+- **PR head tested by CI:** `fefa90ad672461f32c1c13b5471649ed7df72e41`
+- **CI:** “Verify MVP”, PR run #69 / run ID 39182080397 and main push run #70 / run ID 39182128266; both succeeded.
+- **Pages:** build/deployment run #13 / run ID 39182127601 succeeded on the merge commit.
+- **Test result:** 35 automated tests passed, 0 failed on the PR head.
 - **User runtime check (2026-10-18):** The user confirms completing all game tests on a smartphone; all game tests were reported normal. Device model, OS, and browser version were not recorded.
-- **Automated release check:** The v0.4.8 ZIP previously passed 32 isolated Node tests; this is not a substitute for the release branch's GitHub Actions result.
+- **User Pages check (2026-10-19):** The user confirmed the live page continued to show v0.4.8 after refresh. The v0.4.9 Pages workflow has now succeeded on the merge commit; direct user-visible v0.4.9 confirmation is still pending.
+- **Automated release check:** The v0.4.8 ZIP previously passed 32 isolated Node tests; this is not a substitute for GitHub Actions.
 - **Still not proven by automated tests:** camera permission/live feed, actual on-device model inference, GPS permission/location behavior, touch/responsive behavior on target devices, and persistence behavior across real browser origins.
 
 The current source of truth is the repository, especially:
@@ -152,14 +154,14 @@ The merged fix:
 
 ## 6. Current implementation and verification
 
-### Merged v0.4.7
+### Merged v0.4.9
 
 - Replaceable game modules (RPS, Odd/Even, Dice).
 - Shared normalized result contract and host-owned battle lifecycle.
 - My AI collected-Monster loss history/statistic fix.
-- Title, visible version badge, and schema marker aligned to v0.4.7.
+- Title, visible version badge, and schema marker aligned to v0.4.9.
 - Development constitution expanded to require end-to-end traceability and module invariants.
-- CI passed on the exact PR head: 27 tests, 0 failures.
+- CI passed on the exact PR head: 35 tests, 0 failures, including an integrated P3 re-observation regression test.
 - The user manually confirmed game selection and switching work in the actual browser.
 
 ### Automated tests cover
@@ -189,7 +191,7 @@ Treat this as a **proposed sequence**, not a promise or a fixed delivery schedul
 
 ### Phase 0 — Stabilize the current vertical slice
 
-1. Confirm `main` contains the merged v0.4.8 change and the repository is clean/consistent.
+1. Confirm `main` contains the merged v0.4.9 change and the repository is clean/consistent.
 2. Run the full test suite and check CI against current `main`.
 3. Verify version title/badge/schema and remove stale version strings.
 4. Perform a concise browser smoke test for the end-to-end flow: camera → scan → Evidence → confirmation → Quest progress → three objects → game selector → battle outcome → Collection/History.
@@ -199,7 +201,7 @@ Treat this as a **proposed sequence**, not a promise or a fixed delivery schedul
    - the same confirmed object is later re-observed and is eligible for P3 in a new Quest;
    - P3 affects the opponent only.
 6. Verify low-confidence later observations do not reduce confirmation status or incorrectly reduce collection/Quest counts.
-7. The v0.4.8 regression suite verifies the selected game name in the three-object Quest prompt, the completion toast, and protection against battle-result text being overwritten. The user also confirmed smartphone game testing on 2026-10-18.
+7. The v0.4.9 regression suite also exercises real Evidence statistics, confirmation, Battle History, and P3 rules together: one observation is insufficient; re-observation alone is insufficient; the same object becomes eligible after its own Monster loss; later low-confidence Evidence does not revoke prior confirmation. The user confirmed smartphone game-module testing on v0.4.8, not yet on v0.4.9.
 8. Ensure WIN, LOSE, DRAW messages identify both participants and the game result clearly.
 9. Record actual browser/device findings separately from automated CI results.
 
@@ -296,4 +298,4 @@ Preserve the project mission: “AI에게 세상을 가르치고, AI와 함께 �
 
 Follow the full development constitution. For each requested change, trace the entire connected behavior chain—state writers/readers, transitions, UI, persistence, history/statistics, and downstream rules. Define acceptance criteria, implement the smallest complete fix, add regression tests, run all relevant tests and CI on the exact commit, inspect the diff, and clearly state what was not tested. Do not ask the human to repeat information already available. Never claim a test passed without observing the result. Never merge a PR without explicit user approval.
 
-Do not expand to AR/XR or other large features before stabilizing the smallest engine. Start from the merged v0.4.8 baseline. The current CI suite passes 34 tests, and the user has confirmed smartphone game testing. Continue with any remaining roadmap checks not already covered by the automated suite or the user's device report, especially P3 first-capture/loss/re-observation and confirmation stability under low-confidence observations.
+Do not expand to AR/XR or other large features before stabilizing the smallest engine. Start from the merged v0.4.9 baseline. The current CI suite passes 35 tests. The user confirmed smartphone game-module testing on v0.4.8; v0.4.9 still needs live-page confirmation. Next, verify the deployed version and then consider migration tests for older localStorage schema/state.
