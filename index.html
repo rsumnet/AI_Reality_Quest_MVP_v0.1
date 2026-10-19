@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#111827">
-<title>AI Reality Quest — MVP v0.5.0</title>
+<title>AI Reality Quest — MVP v0.5.1</title>
 <style>
 :root{--bg:#0b1020;--card:#151c30;--card2:#1b2540;--text:#f4f7fb;--muted:#9eabc4;--accent:#7dd3fc;--good:#86efac;--warn:#fde68a;--bad:#fca5a5;--line:#2b3857}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#0b1020,#10172a);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -19,7 +19,7 @@
 </head>
 <body>
 <div class="app">
-  <div class="top"><div><h1>🗺️ AI Reality Quest</h1><div class="sub">AI에게 세상을 가르치고, AI와 함께 세상을 탐험한다.</div></div><div class="badge">MVP v0.5.0 · Browser / On-device inference</div></div>
+  <div class="top"><div><h1>🗺️ AI Reality Quest</h1><div class="sub">AI에게 세상을 가르치고, AI와 함께 세상을 탐험한다.</div></div><div class="badge">MVP v0.5.1 · Browser / On-device inference</div></div>
   <div class="grid">
     <section class="card">
       <h2>① Reality Scanner</h2>
@@ -69,6 +69,7 @@
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script src="core/storage-migration.js"></script>
 <script src="games/game-registry.js"></script>
 <script src="games/rps.js"></script>
 <script src="games/odd-even.js"></script>
@@ -76,14 +77,15 @@
 <script src="games/yut.js"></script>
 <script src="games/sudoku.js"></script>
 <script>
-const ARQ_SCHEMA_VERSION='0.5.0';
+const ARQ_SCHEMA_VERSION='0.5.1';
 const P3_RULE_ENGINE_VERSION='simple-0.1';
 const P3_RULE_ENGINE={version:P3_RULE_ENGINE_VERSION,eligibleContexts({contexts,battles}){const confirmed=contexts.filter(c=>c.status==='CONFIRMED');return confirmed.map(context=>{const id=context.physical_object_id;const stats=objectStatsById(id);const battleStats=battleStatsFrom(battles,id);return {context,evidenceCount:stats.count,confirmed:isConfirmedId(id),battleStats};}).filter(x=>x.evidenceCount>=2&&x.confirmed&&x.battleStats.ownMonsterLosses>0).map(x=>x.context)},evaluate({contexts,battles,candidates}){const confirmed=contexts.filter(c=>c.status==='CONFIRMED');if(!confirmed.length||!candidates.length)return {applied:false,selected:null,reason:'Personal Context 없음'};const eligible=this.eligibleContexts({contexts,battles});if(!eligible.length)return {applied:false,selected:null,reason:'My AI 객체가 우리팀에서 패배해 사라진 기록 없음'};const scored=candidates.map(candidate=>{const context=eligible.find(c=>c.physical_object_id===candidate.physical_object_id);if(!context)return null;const stats=battleStatsFrom(battles,candidate.physical_object_id);const score=1+(stats.ownMonsterLosses*3)+(stats.encounters*0.1);return {...candidate,score,context,stats,reason:'우리팀에서 패배해 잃은 My AI 객체를 우선 재선택'};}).filter(Boolean).sort((a,b)=>b.score-a.score);if(!scored.length)return {applied:false,selected:null,reason:confirmed.some(c=>battleStatsFrom(battles,c.physical_object_id).missed===0)?'과거 패배 기록이 있는 Personal Context 객체 없음':'현재 상대 후보 중 Personal Context 객체 없음'};const selected=scored[0];return {applied:true,selected,reason:selected.reason,engine:this.version};}};
 const PERSONAL_AI_SCHEMA={evidence:['id','object','confidence','time','location','zone','source','model','processing','human_feedback','context_ref','physical_object_id','visual_fingerprint'],context:['id','purpose','mission','situation','references','history'],rules:['id','when','condition','then','priority','source']};
-const state={model:null,stream:null,last:null,personalContexts:JSON.parse(localStorage.getItem('arq_personal_contexts')||'[]'),zone:localStorage.getItem('arq_zone')||null,gps:JSON.parse(localStorage.getItem('arq_gps')||'null'),evidence:JSON.parse(localStorage.getItem('arq_evidence')||'[]'),monsters:JSON.parse(localStorage.getItem('arq_monsters')||'[]'),battles:JSON.parse(localStorage.getItem('arq_battles')||'[]'),attempts:JSON.parse(localStorage.getItem('arq_attempts')||'[]'),battlePending:JSON.parse(localStorage.getItem('arq_battle_pending')||'null'),battleUnlocked:localStorage.getItem('arq_battle_unlocked')==='1',selectedGameId:localStorage.getItem('arq_selected_game')||'rps',questObjects:JSON.parse(localStorage.getItem('arq_quest_objects')||'[]').map(q=>typeof q==='string'?{name:q,physical_object_id:null}:q),selectedObjectId:null,selectedEvidenceId:null};state.battleUnlocked=state.battleUnlocked||state.questObjects.length>=3;state.battleOutcomeShown=false;
+const storageMigration=ARQStorageMigration.migrate(localStorage);
+const state={model:null,stream:null,last:null,personalContexts:storageMigration.personalContexts,zone:storageMigration.zone,gps:storageMigration.gps,evidence:storageMigration.evidence,monsters:storageMigration.monsters,battles:storageMigration.battles,attempts:storageMigration.attempts,battlePending:storageMigration.battlePending,battleUnlocked:storageMigration.battleUnlocked,selectedGameId:storageMigration.selectedGameId,questObjects:storageMigration.questObjects,selectedObjectId:null,selectedEvidenceId:null};state.battleUnlocked=state.battleUnlocked||state.questObjects.length>=3;state.battleOutcomeShown=false;
 
 const $=id=>document.getElementById(id);
-function save(){localStorage.setItem('arq_personal_contexts',JSON.stringify(state.personalContexts));localStorage.setItem('arq_zone',state.zone||'');localStorage.setItem('arq_gps',JSON.stringify(state.gps));localStorage.setItem('arq_evidence',JSON.stringify(state.evidence));localStorage.setItem('arq_monsters',JSON.stringify(state.monsters));localStorage.setItem('arq_battles',JSON.stringify(state.battles));localStorage.setItem('arq_attempts',JSON.stringify(state.attempts));localStorage.setItem('arq_battle_pending',JSON.stringify(state.battlePending));localStorage.setItem('arq_battle_unlocked',state.battleUnlocked?'1':'0');localStorage.setItem('arq_quest_objects',JSON.stringify(state.questObjects));}
+function save(){localStorage.setItem('arq_personal_contexts',JSON.stringify(state.personalContexts));localStorage.setItem('arq_zone',state.zone||'');localStorage.setItem('arq_gps',JSON.stringify(state.gps));localStorage.setItem('arq_evidence',JSON.stringify(state.evidence));localStorage.setItem('arq_monsters',JSON.stringify(state.monsters));localStorage.setItem('arq_battles',JSON.stringify(state.battles));localStorage.setItem('arq_attempts',JSON.stringify(state.attempts));localStorage.setItem('arq_battle_pending',JSON.stringify(state.battlePending));localStorage.setItem('arq_battle_unlocked',state.battleUnlocked?'1':'0');localStorage.setItem('arq_quest_objects',JSON.stringify(state.questObjects));localStorage.setItem('arq_schema_version',ARQ_SCHEMA_VERSION);}
 function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1800)}
 function zoneFrom(lat,lon){return 'Z'+Math.floor((Math.abs(lat*1000)+Math.abs(lon*1000))%99).toString().padStart(2,'0')}
 function canonicalBase(label){return String(label||'object').trim().toUpperCase().replace(/[^A-Z0-9가-힣]+/g,'_').replace(/^_+|_+$/g,'')||'OBJECT'}
@@ -337,7 +339,7 @@ function battle(choice){
  if(!gameOutcome||!['WIN','LOSE','DRAW'].includes(gameOutcome.result)){$('battleResult').textContent='게임 모듈이 유효한 WIN/LOSE/DRAW 결과를 반환하지 않았습니다.';return}
  handleGameOutcome({choice,game,actor,actorType,opponent,p3Info,quest,gameOutcome});
 }
-$('start').onclick=startCamera;$('scanBtn').onclick=scan;$('gps').onclick=gps;$('closeObjectView').onclick=closeObjectHistory;$('gameSelector').onchange=()=>{state.selectedGameId=$('gameSelector').value;localStorage.setItem('arq_selected_game',state.selectedGameId);clearBattleResult();renderGameModule()};$('newBattle').onclick=()=>{clearBattleResult();render()};renderGameModule();render();
+$('start').onclick=startCamera;$('scanBtn').onclick=scan;$('gps').onclick=gps;$('closeObjectView').onclick=closeObjectHistory;$('gameSelector').onchange=()=>{state.selectedGameId=$('gameSelector').value;localStorage.setItem('arq_selected_game',state.selectedGameId);clearBattleResult();renderGameModule()};$('newBattle').onclick=()=>{clearBattleResult();render()};renderGameModule();render();if(storageMigration.warnings.length)toast('일부 저장 항목을 읽지 못했습니다. 해당 원본은 마이그레이션에서 덮어쓰지 않았습니다.');
 </script>
 </body>
 </html>
