@@ -11,6 +11,8 @@
 - PR #8 head 3d0dd3303e23f383a739c5d69353121bcaeef93f의 Verify MVP run #94 성공; main merge SHA의 Verify MVP run #95 성공
 - GitHub Pages deployment run #17 성공. 사용자는 병합 전 운영 사이트 v0.5.0과 v0.5.1 Codespaces 미리보기를 확인했습니다. 병합 이후 운영 Pages에 v0.5.1이 표시되는지는 사용자 직접 새로고침 확인이 아직 필요합니다.
 - 현재 작업 브랜치: v0.5.2-core-expansion (v0.5.1 병합 이후 main에서 분기)
+- v0.5.2 Draft PR: https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/9
+- PR #9 검증: Verify MVP run #98 성공, 59 tests / 59 pass / 0 fail on code head d375d55b2c541144351a028b50e969771a16e245. 문서 변경으로 PR head가 바뀌면 최종 head CI를 다시 확인해야 합니다.
 
 ## 2. v0.5.1에서 완료한 것
 
@@ -26,10 +28,10 @@
 - 게임 모듈 레지스트리에 정규화된 metadata 계약 추가: API 버전, 모듈 버전, 난이도, 태그.
 - games/game-runtime.js 추가: UI 렌더 예외, 잘못된 WIN/LOSE/DRAW 결과, resolve 예외/Promise 결과를 공통 Battle 상태를 변경하기 전에 차단.
 - 게임 실행/결과 처리 중 예외가 발생하면 Battle/Monster/Quest 상태를 복구.
-- core/my-ai-runtime.js 추가: 명시적으로 로컬인 provider adapter 계약, 사용자가 확인한 Personal Context만 포함하는 context package, Evidence 필드 최소화. 실제 LLM 모델이나 설치기는 아직 연결하지 않음.
+- core/my-ai-runtime.js 추가: 명시적으로 로컬인 provider adapter 계약, 사용자가 확인한 Personal Context만 포함하는 context package, Evidence 필드 최소화. 실제 LLM 모델이나 설치기는 아직 연결하지 않음. local 표시는 provider가 네트워크를 사용하지 않는다는 기술적 보장이 아니므로, 구현 검토 전에는 민감한 Context를 연결하지 않음.
 - core/xr-bridge.js 추가: 버전이 있는 in-memory 이벤트 구독/발행 계약. 네트워크 전송이나 XR 렌더링은 아직 없음.
 - 테스트로 위 계약과 실패 경계를 검증하고, README를 업데이트.
-- PR 생성 전에는 현재 브랜치의 정확한 HEAD와 CI 결과를 다시 확인하고, 코드 diff를 검토합니다.
+- PR #9는 Draft 상태이며 병합하지 않았습니다. 최신 head CI가 통과한 뒤 Codespaces 미리보기에서 v0.5.2 버전, 게임 메타데이터 표시, 게임 한 라운드를 최소 확인하고 사용자 승인 후에만 병합합니다.
 
 ## 4. 다음 개발 순서
 
