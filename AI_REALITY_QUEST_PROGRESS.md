@@ -12,7 +12,7 @@
 - GitHub Pages deployment run #17 성공. 사용자는 병합 전 운영 사이트 v0.5.0과 v0.5.1 Codespaces 미리보기를 확인했습니다. 병합 이후 운영 Pages에 v0.5.1이 표시되는지는 사용자 직접 새로고침 확인이 아직 필요합니다.
 - 현재 작업 브랜치: v0.5.2-core-expansion (v0.5.1 병합 이후 main에서 분기)
 - v0.5.2 Draft PR: https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/9
-- PR #9 검증: Verify MVP run #98 성공, 59 tests / 59 pass / 0 fail on code head d375d55b2c541144351a028b50e969771a16e245. 문서 변경으로 PR head가 바뀌면 최종 head CI를 다시 확인해야 합니다.
+- PR #9 코드 검증: Verify MVP run #101 성공, 59 tests / 59 pass / 0 fail on code/test head 3c490963278545aafab863851da36ab1d04426f1. 이 인수 문서의 추가 수정으로 PR head가 다시 바뀌므로, 병합 전에는 최신 Actions run이 성공인지 다시 확인합니다.
 
 ## 2. v0.5.1에서 완료한 것
 
