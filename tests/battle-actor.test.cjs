@@ -137,6 +137,8 @@ test('battle integration never sends the customer out while a team monster remai
     render: () => {},
     toast: () => {}
   };
+  sandbox.window = sandbox;
+  vm.runInNewContext(fs.readFileSync('games/game-runtime.js', 'utf8'), sandbox, { filename: 'games/game-runtime.js' });
   vm.runInNewContext(outcomeMatch[0] + '\n' + battleMatch[0] + '\nthis.battle = battle;', sandbox);
 
   sandbox.battle('rock'); // rock vs rock => DRAW
