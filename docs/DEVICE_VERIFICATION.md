@@ -7,26 +7,26 @@
 - **브랜치/PR:** `v0.5.1-storage-migration` / PR #8
 - **마이그레이션 범위:** 구버전 Quest 문자열을 객체로 변환, Evidence의 ID와 `schemaVersion` 보장, Personal Context의 `schemaVersion` 통일, 잘못된 JSON 및 비정상 GPS/Battle pending 값을 안전한 기본값으로 복구, 정상적인 `collected_monster` pending 상태 보존, 이미 정상인 데이터에 대한 멱등성.
 - **자동화 범위:** RPS / 홀짝 / 주사위 / 윷놀이 / 4×4 스도쿠의 공통 게임 계약, Battle 출전자/결과/기록, P3 조건, Evidence/Personal Context 마이그레이션.
-- **검증된 코드 head:** `f864c7b189e43fcccc97e63407a875a33f688660`.
-- **GitHub Actions:** [Verify MVP run #91](https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/actions/runs/39190235345) — 성공.
+- **검증된 코드 head:** `83fb60f2ba88b1298862ad1f9223410da73040f7`.
+- **GitHub Actions:** [Verify MVP run #93](https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/actions/runs/39190342656) — 성공.
 - **테스트 결과:** 44 tests / 44 pass / 0 fail.
-- PR은 초안 상태이며 아래의 실제 브라우저/기기 검증은 아직 대기 중입니다.
+- **상태:** 자동화 검증은 통과했으며, PR #8은 사용자 승인 전까지 병합하지 않습니다.
 
-## 2. 최소 수동 스모크 테스트 — 대기
+## 2. 사용자 보고 수동 스모크 테스트 — 2026-10-19
 
-날짜 / 기기(OS 포함) / 브라우저 버전 / 결과를 기록합니다.
+사용자는 운영 GitHub Pages에서 v0.5.0이 표시되는 것을 확인했고, Codespaces HTTPS 미리보기에서 v0.5.1이 표시되는 것도 확인했습니다. 이후 제안한 테스트 대부분이 정상 작동했다고 보고했습니다. 다만 각 저장 데이터 항목의 개별 결과, 기기 모델/OS, 브라우저 버전은 메시지에 항목별로 기록되지 않았으므로 아래 표는 확인된 범위만 표시합니다.
 
-| # | 확인 항목 | 기대 결과 | 상태 |
+| # | 확인 항목 | 상태 | 근거/메모 |
 |---|---|---|---|
-| 1 | 운영 GitHub Pages | 새로고침 후 MVP v0.5.0 표시 | 대기 |
-| 2 | Codespaces v0.5.1 미리보기 | MVP v0.5.1 표시 | 대기 |
-| 3 | 기존 localStorage 데이터 | Evidence, Monster Collection, Quest 진행, Personal Context, Battle History가 유지됨 | 대기 |
-| 4 | 마이그레이션 후 새로고침 | 유효한 데이터가 유지되고 Quest 객체 이름이 정상 표시됨 | 대기 |
-| 5 | 게임 모듈 | 게임 선택 및 한 라운드 정상 작동 | 대기 |
-| 6 | 카메라/객체 관측 | 대상 브라우저에서 권한, 모델 로딩, 관측 정상 작동 | 대기 |
-| 7 | GPS/Zone | 테스트하는 경우 권한과 Zone/Evidence 기록 확인 | 대기 |
+| 1 | 운영 GitHub Pages | **통과** | 사용자 직접 확인: 새로고침 후 MVP v0.5.0 표시 |
+| 2 | Codespaces v0.5.1 미리보기 | **통과** | 사용자 직접 확인: MVP v0.5.1 표시 |
+| 3 | 기존 localStorage 데이터 | **개별 결과 미기록** | 사용자는 대부분의 테스트가 정상이라고 보고했으나 각 데이터 범주별 결과는 미기록 |
+| 4 | 마이그레이션 후 새로고침 | **개별 결과 미기록** | 사용자는 대부분의 테스트가 정상이라고 보고했으나 항목별 결과는 미기록 |
+| 5 | 게임 모듈 한 라운드 | **개별 결과 미기록** | 사용자는 대부분의 테스트가 정상이라고 보고했으나 어떤 게임을 실행했는지 미기록 |
+| 6 | 카메라/객체 관측 | **미보고** | 별도 실기기 결과 없음 |
+| 7 | GPS/Zone | **미보고** | 별도 실기기 결과 없음 |
 
-**주의:** v0.5.0 미리보기를 열었던 것과 동일한 Codespaces HTTPS 주소와 브라우저 프로필을 사용해야 해당 origin의 기존 localStorage를 확인할 수 있습니다. 브라우저 데이터나 localStorage를 지우지 마세요. 기존 데이터가 사라지거나 페이지가 비정상 동작하면 추가 조작을 멈추고 화면 상태를 알려주세요.
+**데이터 안전 주의:** 브라우저 데이터나 localStorage를 지우지 마세요. 기존 데이터가 사라지거나 페이지가 비정상 동작하면 추가 조작을 멈추고 화면 상태를 알려주세요.
 
 ## 3. 자동화만으로 확인되지 않는 사항
 
