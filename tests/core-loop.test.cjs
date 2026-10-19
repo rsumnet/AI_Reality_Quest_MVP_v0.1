@@ -14,6 +14,12 @@ test('v0.5.2 title, badge, and schema version agree', () => {
   assert.match(script, /const ARQ_SCHEMA_VERSION='0\.5\.2';/);
 });
 
+test('shared runtime adapters are loaded before the application initializes', () => {
+  assert.match(html, /games\\/game-runtime\\.js/);
+  assert.match(html, /core\\/my-ai-runtime\\.js/);
+  assert.match(html, /core\\/xr-bridge\\.js/);
+});
+
 test('P3 engine exposes reusable eligibility rules', () => {
   const start = script.indexOf('const P3_RULE_ENGINE={');
   const end = script.indexOf('\nconst PERSONAL_AI_SCHEMA', start);
