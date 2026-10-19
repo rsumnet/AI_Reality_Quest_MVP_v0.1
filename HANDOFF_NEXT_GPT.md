@@ -9,7 +9,7 @@
 
 - **Repository:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1
 - **Default branch:** `main`
-- **Latest verified app version:** `MVP v0.4.9` (CI passed; GitHub Pages deployment workflow succeeded, live text not yet re-confirmed by the user)
+- **Latest merged app version:** `MVP v0.4.9`; v0.5.0 candidate branch `v0.5.0-p1-game-modules` is not merged (CI passed; GitHub Pages deployment workflow succeeded, live text not yet re-confirmed by the user)
 - **Latest merged change:** PR #6, merge-commit merged on 2026-10-19
 - **Merge commit:** `a1c33e3f7f0fec9a25a0971ee442401e1b95d0c2`
 - **Merged PR:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/6
@@ -112,10 +112,12 @@ The shared core owns:
 
 ### Replaceable game modules
 
-Registered through `window.ARQGameRegistry`. Current modules:
+Registered through `window.ARQGameRegistry`. Current modules on merged `main` (v0.4.9):
 - `games/rps.js` — Rock Paper Scissors.
 - `games/odd-even.js` — Odd/Even.
 - `games/dice.js` — Dice.
+
+The v0.5.0 candidate branch `v0.5.0-p1-game-modules` adds `games/yut.js` and `games/sudoku.js`; it remains unmerged until the user performs the agreed minimal final device check.
 
 The game selector allows the user to change the game module. The user tested this in the actual browser and confirmed switching works.
 
@@ -154,12 +156,15 @@ The merged fix:
 
 ## 6. Current implementation and verification
 
-### Merged v0.4.9
+### Merged baseline v0.4.9
+
+### v0.5.0 candidate (not merged)
 
 - Replaceable game modules (RPS, Odd/Even, Dice).
 - Shared normalized result contract and host-owned battle lifecycle.
 - My AI collected-Monster loss history/statistic fix.
-- Title, visible version badge, and schema marker aligned to v0.4.9.
+- Merged baseline: title, visible version badge, and schema marker aligned to v0.4.9.
+- v0.5.0 candidate adds Yut and 4×4 Sudoku and keeps the v0.4.9 P3 regression tests.
 - Development constitution expanded to require end-to-end traceability and module invariants.
 - CI passed on the exact PR head: 35 tests, 0 failures, including an integrated P3 re-observation regression test.
 - The user manually confirmed game selection and switching work in the actual browser.
@@ -298,4 +303,4 @@ Preserve the project mission: “AI에게 세상을 가르치고, AI와 함께 �
 
 Follow the full development constitution. For each requested change, trace the entire connected behavior chain—state writers/readers, transitions, UI, persistence, history/statistics, and downstream rules. Define acceptance criteria, implement the smallest complete fix, add regression tests, run all relevant tests and CI on the exact commit, inspect the diff, and clearly state what was not tested. Do not ask the human to repeat information already available. Never claim a test passed without observing the result. Never merge a PR without explicit user approval.
 
-Do not expand to AR/XR or other large features before stabilizing the smallest engine. Start from the merged v0.4.9 baseline. The current CI suite passes 35 tests. The user confirmed smartphone game-module testing on v0.4.8; v0.4.9 still needs live-page confirmation. Next, verify the deployed version and then consider migration tests for older localStorage schema/state.
+Do not expand to AR/XR or other large features before stabilizing the smallest engine. Start from the merged v0.4.9 baseline. The merged v0.4.9 CI suite passed 35 tests; v0.5.0 candidate CI must be checked separately. The user confirmed smartphone game-module testing on v0.4.8; v0.4.9 still needs live-page confirmation. Next, verify the deployed version and then consider migration tests for older localStorage schema/state.
