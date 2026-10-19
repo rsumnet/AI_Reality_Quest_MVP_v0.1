@@ -7,8 +7,8 @@
 - **브랜치/PR:** `v0.5.1-storage-migration` / PR #8
 - **마이그레이션 범위:** 구버전 Quest 문자열을 객체로 변환, Evidence의 ID와 `schemaVersion` 보장, Personal Context의 `schemaVersion` 통일, 잘못된 JSON 및 비정상 GPS/Battle pending 값을 안전한 기본값으로 복구, 정상적인 `collected_monster` pending 상태 보존, 이미 정상인 데이터에 대한 멱등성.
 - **자동화 범위:** RPS / 홀짝 / 주사위 / 윷놀이 / 4×4 스도쿠의 공통 게임 계약, Battle 출전자/결과/기록, P3 조건, Evidence/Personal Context 마이그레이션.
-- **검증된 코드 head:** `47745f2db174f9bc062ced5bd5fdcf8110d0d93a`.
-- **GitHub Actions:** [Verify MVP run #90](https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/actions/runs/39190168320) — 성공.
+- **검증된 코드 head:** `f864c7b189e43fcccc97e63407a875a33f688660`.
+- **GitHub Actions:** [Verify MVP run #91](https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/actions/runs/39190235345) — 성공.
 - **테스트 결과:** 44 tests / 44 pass / 0 fail.
 - PR은 초안 상태이며 아래의 실제 브라우저/기기 검증은 아직 대기 중입니다.
 
