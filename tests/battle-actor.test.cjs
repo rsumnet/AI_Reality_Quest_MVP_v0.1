@@ -260,8 +260,8 @@ test('Quest games are loaded from replaceable modules rather than hard-coded RPS
   assert.match(html, /games\/odd-even\.js/);
   assert.match(html, /games\/dice\.js/);
   assert.match(html, /id="gameSelector"/);
-  assert.match(html, /game\.renderControls\(\$\('gameControls'\),action=>battle\(action\)/);
-  assert.match(inlineScript[1], /game\.resolveRound\(choice,\{actor,actorType,opponent,quest,random:Math\.random\}\)/);
+  assert.match(html, /ARQGameRuntime\.renderControls\(game,\$\('gameControls'\),action=>battle\(action\)/);
+  assert.match(inlineScript[1], /ARQGameRuntime\.resolveRound\(game,choice,\{actor,actorType,opponent,quest,random:Math\.random\}\)/);
 });
 
 test('losing the first collected My AI Monster persists its identity and increments missed exactly once', () => {
