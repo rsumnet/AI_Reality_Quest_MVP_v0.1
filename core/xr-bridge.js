@@ -2,6 +2,7 @@
   const subscribers=new Map();
   const SCHEMA='arq-xr-event/0.1';
   function isPlainObject(value){return value!==null&&typeof value==='object'&&!Array.isArray(value);}
+  function deepFreeze(value){if(value&&typeof value==='object'&&!Object.isFrozen(value)){Object.values(value).forEach(deepFreeze);Object.freeze(value);}return value;}
   function validType(type){return typeof type==='string'&&/^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*){1,3}$/.test(type);}
   function subscribe(type,handler){
     if(!validType(type))throw new Error('XR bridge event type is invalid');
@@ -14,7 +15,7 @@
     if(!validType(type))throw new Error('XR bridge event type is invalid');
     if(!isPlainObject(payload))throw new Error('XR bridge payload must be an object');
     let safePayload;
-    try{safePayload=JSON.parse(JSON.stringify(payload));}
+    try{safePayload=deepFreeze(JSON.parse(JSON.stringify(payload)));}
     catch(error){throw new Error('XR bridge payload must be JSON serializable');}
     const event=Object.freeze({schemaVersion:SCHEMA,type,emittedAt:new Date().toISOString(),payload:safePayload});
     for(const handler of [...(subscribers.get(type)||[])]){
