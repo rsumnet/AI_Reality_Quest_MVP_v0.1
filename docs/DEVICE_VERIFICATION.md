@@ -4,6 +4,22 @@
 
 ## 1. 자동화 검증
 
+### v0.5.0 — PR 자동 검증 완료, 실기기 최종 확인 대기
+
+- PR #7 head: `3848bbe08b6a9be5420a40378ec3e3e2369a1547`
+- GitHub Actions “Verify MVP” run #74 / run ID `39183338584` — **success**
+- 결과: **37 tests / 37 pass / 0 fail** (Node.js 20, GitHub-hosted Ubuntu runner)
+- 포함 범위: v0.4.9 P3 회귀 테스트 + 윷놀이 WIN/LOSE/DRAW 계약 + 스도쿠 정답/오답 계약.
+- PR: https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/7 — **open, not merged**.
+- 실기기 확인은 아직 수행되지 않았으며, 사용자 확인 후에만 `main` 병합 및 Pages 자동배포를 진행합니다.
+
+최소 실기기 확인:
+1. 화면 버전이 `MVP v0.5.0`인지 확인합니다.
+2. Quest Game에서 `윷놀이`를 선택해 1회 실행하고 결과 화면이 정상인지 확인합니다.
+3. `스도쿠 4×4`를 선택해 정답 또는 오답을 1회 제출하고 결과 화면이 정상인지 확인합니다.
+4. 게임 전환 후 페이지가 멈추거나 오류 화면으로 바뀌지 않는지 확인합니다.
+
+
 ### v0.4.9 — 최신 검증 버전
 
 - PR #6 head: `fefa90ad672461f32c1c13b5471649ed7df72e41`

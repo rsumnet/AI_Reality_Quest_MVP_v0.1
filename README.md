@@ -1,4 +1,4 @@
-# AI Reality Quest — MVP v0.4.9
+# AI Reality Quest — MVP v0.5.0
 
 현실 관측 → On-device AI → Evidence → 확정 객체 → Quest → 교체 가능한 게임 모듈 → Monster Collection → Personal Context/P3 학습 기록으로 이어지는 최소 vertical slice를 검증합니다.
 
@@ -8,13 +8,15 @@
 - 발견 객체, confidence, 시간, source, processing, zone을 Evidence로 기록
 - 누적 관측을 바탕으로 객체 확정 및 서로 다른 객체 3개 수집 Quest
 - GPS 원본 좌표와 Zone을 Evidence에 기록합니다. 원본 좌표는 `localStorage`에 저장되므로 이 버전에서는 개인 기기 MVP 범위로 취급하며, 다중 사용자/서버 동기화 전 개인정보 검토가 필요합니다.
-- 게임 모듈을 교체해 가위바위보 / 홀짝 / 주사위 Battle 실행
+- 게임 모듈을 교체해 가위바위보 / 홀짝 / 주사위 / 윷놀이 / 스도쿠 4×4 Battle 실행
 - WIN 시 상대 Quest 몬스터를 Monster Collection에 수집
 - 우리팀 Monster LOSE 시 Collection에서 제거하고 놓친 기록을 남김
 - 사용자가 확인한 Personal Context와 Battle History를 이용해 P3 Rule Engine이 상대팀 후보 선택에만 개입하고 근거를 표시
 - Evidence / Monster / Battle / Quest / Personal Context는 localStorage에 저장
 
 ## 실행 및 자동 검증
+
+v0.5.0 후보는 v0.4.9의 P3 회귀 검증을 유지하고 윷놀이·스도쿠 4×4 모듈을 추가합니다. 현재 자동 테스트는 37개이며, 실제 기기 최종 확인 전까지 `main`에 병합하지 않습니다.
 
 카메라와 위치 권한 때문에 `file://` 직접 실행보다 localhost/HTTPS를 권장합니다.
 
