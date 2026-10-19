@@ -74,10 +74,12 @@ test('XR bridge publishes versioned in-memory events to subscribers', () => {
   const { ARQXRBridge } = loadContracts();
   const received = [];
   const unsubscribe = ARQXRBridge.subscribe('reality.evidence.created', event => received.push(event));
-  const event = ARQXRBridge.publish('reality.evidence.created', { evidenceId: 'e1', physicalObjectId: 'p1' });
+  const event = ARQXRBridge.publish('reality.evidence.created', { evidenceId: 'e1', physicalObjectId: 'p1', meta: { source: 'scanner' } });
   assert.equal(event.schemaVersion, 'arq-xr-event/0.1');
   assert.equal(received.length, 1);
   assert.equal(received[0].payload.evidenceId, 'e1');
+  assert.equal(Object.isFrozen(event.payload), true);
+  assert.equal(Object.isFrozen(event.payload.meta), true);
   unsubscribe();
   ARQXRBridge.publish('reality.evidence.created', { evidenceId: 'e2' });
   assert.equal(received.length, 1);
