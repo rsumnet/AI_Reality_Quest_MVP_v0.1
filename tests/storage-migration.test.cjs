@@ -112,5 +112,6 @@ test('the host saves the active schema version with normal persisted state', () 
   const script = html.match(/<script>([\s\S]*?)<\/script>/);
   assert.ok(script);
   assert.match(script[1], /localStorage\.setItem\('arq_schema_version',ARQ_SCHEMA_VERSION\)/);
+  assert.match(script[1], /function persistStorage\(key,value\)\{if\(storageMigration\.warnings\.includes\(key\)\)return;/);
   assert.match(script[1], /const storageMigration=ARQStorageMigration\.migrate\(localStorage\)/);
 });
