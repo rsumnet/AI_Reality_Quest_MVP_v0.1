@@ -13,7 +13,7 @@
 - 잘못된 게임 결과는 공통 Battle 기록과 Monster Collection을 변경하지 않으며, 결과 처리 중 예외가 발생하면 공통 상태를 복구
 - Evidence / Monster / Battle / Quest / Personal Context는 localStorage에 저장
 - v0.5.1에서 구버전 localStorage 마이그레이션 추가: Quest 문자열 변환, Evidence ID/schemaVersion 보장, Personal Context schemaVersion 정규화, 잘못된 JSON/GPS/Battle pending 안전 복구
-- My AI provider scaffold: 명시적으로 로컬인 provider만 개인 Context를 받을 수 있는 adapter 계약과 데이터 최소화 context package 제공. 실제 LLM 모델/설치 프로그램은 아직 연결되지 않았습니다.
+- My AI provider scaffold: 명시적으로 로컬이라고 등록한 provider만 개인 Context를 받을 수 있는 adapter 계약과 데이터 최소화 context package 제공. 실제 LLM 모델/설치 프로그램은 아직 연결되지 않았으며, local 표시는 네트워크 차단이나 샌드박스를 보장하지 않으므로 provider 구현을 검토하기 전에는 민감한 Context를 연결하면 안 됩니다.
 - XR event bridge scaffold: 버전이 있는 in-memory 이벤트 계약 제공. 아직 실제 XR 렌더링, 기기 연결, 네트워크 전송은 구현하지 않았습니다.
 
 ## 실행 및 자동 검증
