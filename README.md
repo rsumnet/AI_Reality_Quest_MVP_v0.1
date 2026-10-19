@@ -1,4 +1,4 @@
-# AI Reality Quest — MVP v0.5.0
+# AI Reality Quest — MVP v0.5.1
 
 현실 관측 → On-device AI → Evidence → 확정 객체 → Quest → 교체 가능한 게임 모듈 → Monster Collection → Personal Context/P3 학습 기록으로 이어지는 최소 vertical slice를 검증합니다.
 
@@ -16,16 +16,14 @@
 
 ## 실행 및 자동 검증
 
-v0.5.0 후보는 v0.4.9의 P3 회귀 검증을 유지하고 윷놀이·스도쿠 4×4 모듈을 추가합니다. 현재 자동 테스트는 37개이며, 실제 기기 최종 확인 전까지 `main`에 병합하지 않습니다.
-
-카메라와 위치 권한 때문에 `file://` 직접 실행보다 localhost/HTTPS를 권장합니다.
+v0.5.0은 윷놀이·스도쿠 4×4 게임 모듈을 추가했으며 `main`에 병합·배포되었습니다. v0.5.1은 기존 localStorage 데이터를 보존하면서 저장 스키마 버전을 기록하고, 구버전 Quest 객체 문자열을 객체 형식으로 정규화합니다. JSON이 손상된 저장 항목은 마이그레이션 단계에서 덮어쓰지 않고 경고를 표시합니다.
 
 ```bash
-python -m http.server 8000
+python -m http.server 8000 --bind 0.0.0.0
 node --test tests/*.test.cjs
 ```
 
-브라우저에서 `http://localhost:8000`을 열고 `index.html`을 실행합니다. 스마트폰에서 테스트하려면 HTTPS 환경을 권장합니다. GitHub Actions에서도 자동 테스트를 실행합니다.
+브라우저에서 `http://localhost:8000`을 열고 `index.html`을 실행합니다. 스마트폰에서는 Codespaces 포트 전달 HTTPS URL 또는 다른 HTTPS 환경을 권장합니다. GitHub Actions에서도 자동 테스트를 실행합니다.
 
 ## 알려진 MVP 제한
 
@@ -38,4 +36,4 @@ node --test tests/*.test.cjs
 
 ## 다음 개발
 
-다음 버전에서는 실제 기기에서 확인된 회귀 항목을 유지하면서 테스트 커버리지와 게임 모듈 확장 경로를 검증합니다. 다음 변경은 먼저 별도 테스트 브랜치에서 검증한 뒤 반영합니다.
+다음 단계는 v0.5.1 localStorage 마이그레이션의 실제 브라우저 검증입니다. 기존 저장 데이터가 유지되는지, 구버전 Quest 객체가 정상적으로 로드되는지, 새 스키마 버전이 기록되는지 확인한 후에만 병합·배포를 승인합니다.
