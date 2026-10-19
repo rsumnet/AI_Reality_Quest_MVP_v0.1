@@ -4,11 +4,20 @@
 
 ## 1. 자동화 검증
 
-- 기준 버전: AI Reality Quest v0.4.8
-- GitHub Actions: “Verify MVP”, run #62 / run ID 39113538132 — **success**
+### v0.4.9 — 최신 검증 버전
+
+- PR #6 head: `fefa90ad672461f32c1c13b5471649ed7df72e41`
+- PR GitHub Actions: “Verify MVP”, run #69 / run ID 39182080397 — **success**
+- Main GitHub Actions: run #70 / run ID 39182128266 — **success**
+- 결과: **35 tests / 35 pass / 0 fail** (Node.js 20, GitHub-hosted Ubuntu runner)
+- 신규 회귀 테스트는 실제 Evidence 통계, 객체 확정, Battle History, P3 규칙을 결합해 첫 관측·재관측·우리팀 Monster 패배에 따른 P3 개입을 검증합니다.
+- GitHub Pages build/deployment run #13 / run ID 39182127601 — **success** on merge commit `a1c33e3f7f0fec9a25a0971ee442401e1b95d0c2`. 사용자가 라이브 페이지에서 v0.4.9 표시를 직접 확인하는 단계는 남아 있습니다.
+
+### v0.4.8 — 이전 검증 기록
+
 - PR #5 head: `db805d98ef50c3bbf4861b5b302ceb92eacb2816`
-- 결과: **34 tests / 34 pass / 0 fail** (Node.js 20.20.2, GitHub-hosted Ubuntu runner)
-- 대상: `tests/battle-actor.test.cjs`, `tests/game-modules.test.cjs`, `tests/core-loop.test.cjs`
+- GitHub Actions: “Verify MVP”, run #62 / run ID 39113538132 — **success**
+- 결과: **34 tests / 34 pass / 0 fail**
 - ZIP 사전 격리 실행 결과는 32개 통과였으며, 위 GitHub Actions 결과와는 별도로 기록합니다.
 
 ## 2. 사용자 확인 실기기 테스트
