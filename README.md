@@ -16,7 +16,7 @@
 
 ## 실행 및 자동 검증
 
-v0.5.0은 윷놀이·스도쿠 4×4 게임 모듈을 추가했으며 `main`에 병합·배포되었습니다. v0.5.1은 기존 localStorage 데이터를 보존하면서 저장 스키마 버전을 기록하고, 구버전 Quest 객체 문자열을 객체 형식으로 정규화합니다. JSON이 손상된 저장 항목은 마이그레이션 단계에서 덮어쓰지 않고 경고를 표시합니다.
+v0.5.0은 윷놀이·스도쿠 4×4 게임 모듈을 추가했으며 `main`에 병합·배포되었습니다. v0.5.1은 구버전 localStorage를 정규화합니다: Quest 문자열을 객체로 변환하고, Evidence에 ID/스키마 버전을 보장하며, Personal Context의 스키마 버전을 통일하고, 잘못된 JSON과 비정상 GPS/Battle pending 값을 안전한 기본값으로 복구합니다. 정상 데이터는 멱등적으로 유지됩니다.
 
 ```bash
 python -m http.server 8000 --bind 0.0.0.0
@@ -36,4 +36,4 @@ node --test tests/*.test.cjs
 
 ## 다음 개발
 
-다음 단계는 v0.5.1 localStorage 마이그레이션의 실제 브라우저 검증입니다. 기존 저장 데이터가 유지되는지, 구버전 Quest 객체가 정상적으로 로드되는지, 새 스키마 버전이 기록되는지 확인한 후에만 병합·배포를 승인합니다.
+v0.5.1 localStorage 마이그레이션의 자동 테스트는 GitHub Actions에서 확인합니다. 실제 브라우저에서는 기존 Quest/Evidence/Monster/Battle/Personal Context가 정상적으로 유지되는지, 새로고침 후에도 지속되는지 확인한 뒤에만 병합·배포를 승인합니다.
