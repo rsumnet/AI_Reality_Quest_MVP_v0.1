@@ -334,10 +334,10 @@ function battle(choice){
  try{
   const quest=state.questObjects.map(q=>({...q}));
   const resolution=resolveBattleActor(state.monsters,state.battlePending);
-  const pending=resolution.pending;
+  let pending=resolution.pending;
   let actor=resolution.actor,actorType=resolution.actorType;
   if(!actor&&resolution.candidates.length){actor=resolution.candidates[Math.floor(Math.random()*resolution.candidates.length)];actorType='collected_monster';}
-  if(pending&&actorType==='collected_monster'&&actor&&actor.id){} 
+  if(pending&&actorType==='collected_monster'&&actor){pending={...pending,actorType:'monster',actorId:actor.id,actorName:actor.name||actor.object};}
   if(quest.length<3&&!pending){$('battleResult').textContent='다음 Battle을 시작하려면 새로운 객체 3개를 모아주세요.';return;}
   const p3Selection=pending?{opponent:pending.opponent,decision:{applied:false,reason:'기존 Battle 진행 중'}}:p3SelectOpponent(quest);
   const opponent=p3Selection.opponent,game=selectedGame();
