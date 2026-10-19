@@ -9,14 +9,13 @@
 
 - **Repository:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1
 - **Default branch:** `main`
-- **Latest merged app version:** `MVP v0.4.9` (Pages deployment workflow succeeded; live text not yet re-confirmed by the user). The v0.5.0 candidate is in PR #7 and is not merged.
-- **Latest merged change:** PR #6, merge-commit merged on 2026-10-19
-- **Merge commit:** `a1c33e3f7f0fec9a25a0971ee442401e1b95d0c2`
-- **Merged PR:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/6
-- **PR head tested by CI:** `fefa90ad672461f32c1c13b5471649ed7df72e41`
-- **CI:** “Verify MVP”, PR run #69 / run ID 39182080397 and main push run #70 / run ID 39182128266; both succeeded.
-- **Pages:** build/deployment run #13 / run ID 39182127601 succeeded on the merge commit.
-- **Test result:** 35 automated tests passed, 0 failed on the PR head.
+- **Latest merged app version:** `MVP v0.5.0` (PR #7 merged and GitHub Pages deployment workflow succeeded on 2026-10-19; direct live-page version confirmation remains pending). v0.5.1 storage migration is being prepared on branch `v0.5.1-storage-migration`; do not merge until the user completes the final browser/device check and explicitly approves.
+- **Latest merged change:** PR #7, merge commit `d1f56f4ca9b7d57de1e64b9984bb92928fa139d5` on 2026-10-19.
+- **Merged PR:** https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/7
+- **PR head tested by CI:** `66e29465fd377a8d2030b58b7ccd7bcf6c7673f2`.
+- **CI:** “Verify MVP” main push run #76 / ID `39189402044` succeeded after merge; PR run #75 passed 37/37 tests.
+- **Pages:** build/deployment run #16 / ID `39189401919` succeeded on merge commit `d1f56f4ca9b7d57de1e64b9984bb92928fa139d5`.
+- **User preview check:** user confirmed v0.5.0 displayed and Yut + 4×4 Sudoku worked in Codespaces preview. Direct live Pages check remains pending.
 - **User runtime check (2026-10-18):** The user confirms completing all game tests on a smartphone; all game tests were reported normal. Device model, OS, and browser version were not recorded.
 - **User Pages check (2026-10-19):** The user confirmed the live page continued to show v0.4.8 after refresh. The v0.4.9 Pages workflow has now succeeded on the merge commit; direct user-visible v0.4.9 confirmation is still pending.
 - **Automated release check:** The v0.4.8 ZIP previously passed 32 isolated Node tests; this is not a substitute for GitHub Actions.
@@ -158,7 +157,7 @@ The merged fix:
 
 ### Merged baseline v0.4.9
 
-### v0.5.0 candidate (PR #7, not merged)
+### v0.5.0 merged release (PR #7)
 
 - Adds `games/yut.js` and `games/sudoku.js`; shared core and battle lifecycle remain unchanged.
 - Keeps the v0.4.9 P3 regression coverage and adds two game-module contract tests.
@@ -166,7 +165,7 @@ The merged fix:
 - GitHub Actions run #74 / ID `39183338584`: **37/37 tests pass**.
 - An earlier candidate CI run failed on a test-file syntax error; the extra closing brace was removed and the full suite passed on the exact head above.
 - PR link: https://github.com/rsumnet/AI_Reality_Quest_MVP_v0.1/pull/7.
-- **Human final check pending:** verify visible v0.5.0, play one Yut round, play one Sudoku round, and confirm the shared result flow remains usable. Do not merge before that check.
+- **User final check passed in Codespaces preview:** v0.5.0 visible, Yut works, Sudoku works. PR #7 was then merged with explicit user approval; Pages run #16 succeeded. Direct live Pages version check remains pending.
 
 ### Automated tests cover
 
@@ -303,3 +302,11 @@ Preserve the project mission: “AI에게 세상을 가르치고, AI와 함께 �
 Follow the full development constitution. For each requested change, trace the entire connected behavior chain—state writers/readers, transitions, UI, persistence, history/statistics, and downstream rules. Define acceptance criteria, implement the smallest complete fix, add regression tests, run all relevant tests and CI on the exact commit, inspect the diff, and clearly state what was not tested. Do not ask the human to repeat information already available. Never claim a test passed without observing the result. Never merge a PR without explicit user approval.
 
 Do not expand to AR/XR or other large features before stabilizing the smallest engine. Start from the merged v0.4.9 baseline. PR #7 v0.5.0 CI passes 37/37, but it remains unmerged until the user performs the minimal final device check. After that check, merge only after explicit confirmation and verify Pages deployment; then validate the separate v0.5.1 localStorage migration.
+
+
+## Current handoff update — 2026-10-19
+
+- v0.5.0 is merged and Pages deployment workflow #16 succeeded on `d1f56f4ca9b7d57de1e64b9984bb92928fa139d5`.
+- User has not yet confirmed the production Pages URL itself displays v0.5.0; this is part of the next minimal manual check.
+- v0.5.1 is being prepared on `v0.5.1-storage-migration` to add versioned localStorage migration while preserving Evidence, Monsters, Battles, Personal Context, and Quest progress. Migration tests are being added for legacy Quest-object strings, idempotence, malformed JSON non-overwrite, and schema marker behavior.
+- Never merge v0.5.1 without explicit user approval after the final browser/device test. Expected next manual check: verify v0.5.0 live production page first, then preview v0.5.1 with pre-existing localStorage data and confirm counts/history/context survive refresh.
