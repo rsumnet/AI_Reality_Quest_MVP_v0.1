@@ -3,6 +3,7 @@
     id:'dice',
     name:'주사위 대결',
     description:'우리팀과 상대팀이 주사위를 굴려 더 높은 숫자를 얻으면 승리합니다.',
+    metadata:{apiVersion:1,version:'1.0.0',difficulty:'쉬움',tags:['확률','비교']},
     renderControls(container,onAction){
       container.innerHTML='';
       const button=document.createElement('button');
