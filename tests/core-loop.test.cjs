@@ -8,7 +8,7 @@ const match = html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match, 'inline application script exists');
 const script = match[1];
 
-test('v0.4.8 title, badge, and schema version agree', () => {
+test('v0.4.9 title, badge, and schema version agree', () => {
   assert.match(html, /<title>AI Reality Quest — MVP v0\.4\.9<\/title>/);
   assert.match(html, /MVP v0\.4\.9 · Browser \/ On-device inference/);
   assert.match(script, /const ARQ_SCHEMA_VERSION='0\.4\.9';/);
