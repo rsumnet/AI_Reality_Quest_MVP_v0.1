@@ -10,7 +10,7 @@ function loadModules() {
   }) } };
   sandbox.window = sandbox;
   vm.runInNewContext(fs.readFileSync('games/game-registry.js', 'utf8'), sandbox, { filename: 'games/game-registry.js' });
-  for (const path of ['games/rps.js', 'games/odd-even.js', 'games/dice.js']) {
+  for (const path of ['games/rps.js', 'games/odd-even.js', 'games/dice.js', 'games/yut.js', 'games/sudoku.js']) {
     vm.runInNewContext(fs.readFileSync(path, 'utf8'), sandbox, { filename: path });
   }
   return sandbox;
@@ -18,12 +18,16 @@ function loadModules() {
 
 test('registry exposes independently registered RPS and odd-even modules', () => {
   const sandbox = loadModules();
-  assert.equal(sandbox.ARQGameRegistry.list().length, 3);
+  assert.equal(sandbox.ARQGameRegistry.list().length, 5);
   assert.equal(sandbox.ARQGameRegistry.list()[0].id, 'rps');
   assert.equal(sandbox.ARQGameRegistry.list()[1].id, 'odd-even');
   assert.equal(sandbox.ARQGameRegistry.list()[2].id, 'dice');
+  assert.equal(sandbox.ARQGameRegistry.list()[3].id, 'yut');
+  assert.equal(sandbox.ARQGameRegistry.list()[4].id, 'sudoku');
   assert.equal(sandbox.ARQGameRegistry.get('rps').name, '가위바위보');
   assert.equal(sandbox.ARQGameRegistry.get('odd-even').name, '홀짝');
+  assert.equal(sandbox.ARQGameRegistry.get('yut').name, '윷놀이');
+  assert.equal(sandbox.ARQGameRegistry.get('sudoku').name, '스도쿠 4×4');
 });
 
 test('RPS module returns normalized WIN/LOSE/DRAW outcomes', () => {
@@ -81,4 +85,36 @@ test('dice module resolves win, loss, and draw through the same normalized contr
   const draw = game.resolveRound('roll', { random: values([0.5, 0.5]) });
   assert.equal(draw.result, 'DRAW');
   assert.equal(draw.metadata.gameId, 'dice');
+});
+
+
+test('yut module resolves win, loss, and draw through the normalized contract', () => {
+  const game = loadModules().ARQGameRegistry.get('yut');
+  const seq = values => { let i = 0; return () => values[i++]; };
+  const win = game.resolveRound('throw', { random: seq([0.4, 0.4, 0.4, 0.4, 0.6, 0.6, 0.6, 0.4]) });
+  assert.equal(win.result, 'WIN');
+  assert.equal(win.metadata.playerResult, '윷');
+  assert.equal(win.metadata.opponentResult, '도');
+  const lose = game.resolveRound('throw', { random: seq([0.6, 0.6, 0.6, 0.4, 0.4, 0.4, 0.4, 0.6]) });
+  assert.equal(lose.result, 'LOSE');
+  const draw = game.resolveRound('throw', { random: seq([0.4, 0.4, 0.6, 0.6, 0.6, 0.4, 0.6, 0.4]) });
+  assert.equal(draw.result, 'DRAW');
+  assert.equal(draw.metadata.gameId, 'yut');
+});
+
+test('sudoku module resolves correct and incorrect guesses through the normalized contract', () => {
+  const sandbox = loadModules();
+  const game = sandbox.ARQGameRegistry.get('sudoku');
+  const buttons = [];
+  const container = { innerHTML: '', appendChild(button) { buttons.push(button); } };
+  game.renderControls(container, () => {});
+  assert.equal(buttons.length, 5, '퍼즐 표시 + 숫자 버튼 4개');
+  const puzzle = game.getCurrentPuzzle();
+  const win = game.resolveRound(String(puzzle.answer));
+  assert.equal(win.result, 'WIN');
+  assert.equal(win.metadata.guess, String(puzzle.answer));
+  const lose = game.resolveRound(String(((puzzle.answer % 4) + 1)));
+  assert.equal(lose.result, 'LOSE', '오답은 LOSE');
+  assert.equal(win.metadata.gameId, 'sudoku');
+});
 });
