@@ -1,4 +1,4 @@
-# AI Reality Quest — MVP v0.4.8
+# AI Reality Quest — MVP v0.4.9
 
 현실 관측 → On-device AI → Evidence → 확정 객체 → Quest → 교체 가능한 게임 모듈 → Monster Collection → Personal Context/P3 학습 기록으로 이어지는 최소 vertical slice를 검증합니다.
 
