@@ -112,7 +112,7 @@ Never treat a model confidence score as human confirmation. Contradictions remai
 ### Adapter interface now; provider-specific parsers in tested increments
 
 - Gemini Takeout and Claude account export should be dedicated adapters, but mark each “supported” only after a real sample fixture is parsed and tested. Export formats can vary by route/version.
-- First tested set: ChatGPT export + generic files + Claude Code JSONL. Add Gemini and Claude account export adapters immediately after fixture-driven parser tests. Do not promise faithful support for every attachment, voice payload, branch, or historical export variant in v0.1.
+- **MVP release scope:** file-based import adapters for ChatGPT export, Gemini Takeout/export, Claude account export, and user-selected Claude Code JSONL, plus generic TXT/MD/JSON/JSONL. Implementation is staged: first make the adapter framework and ChatGPT/generic path pass; then add Gemini, Claude, and Claude Code adapters using real sample fixtures. Do not declare the MVP import requirement complete until all four named sources have fixture-based tests and a user-facing import report. If an export variant cannot be parsed, preserve the original, report the unsupported fields, and offer generic import where practical. Do not promise faithful support for every attachment, voice payload, branch, or historical export variant in v0.1.
 - No account scraping, password collection, browser-cookie access, or undocumented private API calls in the first MVP.
 - No live email, KakaoTalk, Slack, Instagram, or web-account connectors in the first MVP. Later integrations must use supported APIs/authorized exports, narrow scopes, consent, rate limits, retention rules, and revocation.
 - Importing grants permission only for selected personal-use purposes. Sharing, publication, model training, and cross-user learning require separate explicit opt-in and rights review.
@@ -182,7 +182,7 @@ Voice capture, cloud sync, embeddings, QLoRA, XR rendering, and live connectors 
 - ARQ works without My AI and retains its core game/Evidence path.
 - Adapter failure is visible/recoverable and cannot corrupt ARQ records.
 - Missing provider gives a clear fallback, not a crash.
-- Declared automated tests pass in CI; browser smoke tests cover supported desktop and mobile browsers.
+- Fixture-based import tests pass for ChatGPT export, Gemini export, Claude account export, and Claude Code JSONL; generic TXT/MD/JSON/JSONL paths are covered. Declared automated tests pass in CI; browser smoke tests cover supported desktop and mobile browsers.
 
 ### Release decision
 First run is complete only when critical tests pass, a versioned test report is saved, known limitations are documented, and clean install + restore smoke test is demonstrated. “The page opened” or “the model answered once” is insufficient.
